@@ -4,7 +4,7 @@ import cv2
 
 
 image_path = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\images'
-image_name = 'maksssksksss99.png'
+image_name = 'maksssksksss100.png'
 image = cv2.imread(os.path.join(image_path, image_name))
 
 annotations = pd.read_csv(r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\annotations.csv')
@@ -20,4 +20,5 @@ for index, row in img_table.iterrows():
 
 cv2.imshow(image_name, image)
 cv2.waitKey(0)
+
 
