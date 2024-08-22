@@ -7,7 +7,7 @@ image_path = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\images'
 image_name = 'maksssksksss737.png'
 image = cv2.imread(os.path.join(image_path, image_name))
 
-target_size = (256, 256)
+target_size = (224, 224)
 original_height, original_width = image.shape[:2]
 x_scale = target_size[0] / original_width
 y_scale = target_size[1] / original_height
