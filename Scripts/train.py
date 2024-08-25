@@ -91,6 +91,6 @@ def load_data(df, img_dir, img_size=(224, 224)):
 
     return images, targets
 
-# df = pd.read_csv('labels.csv')
-# img_dir = 'path_to_images'
-# images, targets = load_data(df, img_dir)
+df = pd.read_csv(r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\annotations.csv')
+img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\images'
+images, targets = load_data(df, img_dir)
