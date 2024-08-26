@@ -5,6 +5,8 @@ import pandas as pd
 from PIL import Image
 from torchvision import transforms
 
+import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset, random_split
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -94,3 +96,41 @@ def main():
     images, targets = load_data(df, img_dir, (256, 256))
     
 
+    dataset = TensorDataset(images, targets)
+    train_size = int(0.7 * len(dataset))
+    test_size = len(dataset) - train_size
+    train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
+
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+
+    model = FaceMaskDetection()
+    criterion = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+    num_epochs = 128
+    for epoch in range(num_epochs):
+        model.train()
+        running_loss = 0.0
+        for i, (inputs, targets) in enumerate(train_loader):
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, targets)
+            loss.backward()
+            optimizer.step()
+            running_loss += loss.item()
+
+        model.eval()
+        with torch.no_grad():
+            test_loss = 0.0
+            for inputs, targets in test_loader:
+                outputs = model(inputs)
+                loss = criterion(outputs, targets)
+                test_loss += loss.item()
+
+        print(f'Epoch {epoch+1}/{num_epochs}, Training Loss: {running_loss/len(train_loader):.4f}, Validation Loss: {test_loss/len(test_loader):.4f}')
+
+    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_1.pth")
+
+if __name__ == "__main__":
+    main()
