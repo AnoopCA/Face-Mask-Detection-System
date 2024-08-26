@@ -5,6 +5,7 @@ import pandas as pd
 from PIL import Image
 from torchvision import transforms
 
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class FaceMaskDetection(nn.Module):
@@ -37,7 +38,7 @@ class FaceMaskDetection(nn.Module):
             layers.append(nn.Linear(in_features=in_features, out_features=out_features))
             layers.append(nn.ReLU(inplace=True))
             if out_features != max_detect:
-                layers.append(nn.Dropout(p=40))
+                layers.append(nn.Dropout(p=0.4))
             in_features = out_features
         return nn.Sequential(*layers)
     
@@ -47,21 +48,16 @@ class FaceMaskDetection(nn.Module):
         x = self.classifier(x)
         return x
 
-model = FaceMaskDetection().to(device)
-print(model)
-
-
 def load_data(df, img_dir, img_size=(224, 224)):
-
     transform = transforms.Compose([transforms.Resize(img_size), transforms.ToTensor(),])
     images = []
     targets = []
     for filename in df['filename'].unique():
-        img_path = f"{img_dir}/{filename}"
+        img_path = f"{img_dir}\{filename}"
         img = Image.open(img_path).convert("RGB")
         img = transform(img)
         images.append(img)
-        annotations = df[df['filename'] == filename]
+        annotations = df[df['filename'] == filename].head(20)
         boxes = []
         labels = []
         
@@ -70,7 +66,7 @@ def load_data(df, img_dir, img_size=(224, 224)):
             ymin = row['ymin']
             xmax = row['xmax']
             ymax = row['ymax']
-            label = 0 if row['name'] == 'without_mask' else 1
+            label = 0 if row['label'] == 'without_mask' else 1
             
             boxes.append([xmin / row['width'], ymin / row['height'], xmax / row['width'], ymax / row['height']])
             labels.append(label)
@@ -78,12 +74,11 @@ def load_data(df, img_dir, img_size=(224, 224)):
         max_detect = 20
         while len(boxes) < max_detect:
             boxes.append([0, 0, 0, 0])
-            labels.append(-1)  # Assuming -1 means no object
+            labels.append(0)  # Assuming -1 means no object
         
         boxes = torch.tensor(boxes, dtype=torch.float32)
         labels = torch.tensor(labels, dtype=torch.int64)
         target = torch.cat((boxes, labels.unsqueeze(1)), dim=1)
-        
         targets.append(target)
     
     images = torch.stack(images)
@@ -91,6 +86,11 @@ def load_data(df, img_dir, img_size=(224, 224)):
 
     return images, targets
 
-df = pd.read_csv(r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\annotations.csv')
-img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\images'
-images, targets = load_data(df, img_dir)
+def main():
+    df = pd.read_csv(r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\annotations.csv')
+    img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\images'
+    model = FaceMaskDetection().to(device)
+
+    images, targets = load_data(df, img_dir, (256, 256))
+    
+
