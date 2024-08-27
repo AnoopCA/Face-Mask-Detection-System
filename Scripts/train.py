@@ -17,7 +17,7 @@ class FaceMaskDetection(nn.Module):
         feat_config = [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M']
         in_features = 512 * 7 * 7
         max_detect = 20
-        classifier_config = [4096, 4096, max_detect]
+        classifier_config = [4096, 4096, max_detect * 5]
         
         self.features = self._make_features(in_channels, feat_config)
         self.classifier = self._make_classifier(in_features, classifier_config, max_detect)
@@ -48,10 +48,22 @@ class FaceMaskDetection(nn.Module):
         x = self.features(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
+        x = x.view(x.size(0), 20, 5)
         return x
 
 def load_data(df, img_dir, img_size=(224, 224)):
-    transform = transforms.Compose([transforms.Resize(img_size), transforms.ToTensor(),])
+    transform = transforms.Compose([
+                                      transforms.Resize(img_size),
+                                      transforms.RandomHorizontalFlip(p=0.5),
+                                      transforms.RandomVerticalFlip(p=0.5),
+                                      transforms.RandomRotation(degrees=30),
+                                      transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+                                      transforms.RandomAffine(degrees=0, translate=(0.1, 0.1), scale=(0.8, 1.2), shear=10),
+                                      transforms.RandomGrayscale(p=0.1),
+                                      transforms.RandomPerspective(distortion_scale=0.2, p=0.5),
+                                      transforms.ToTensor(),
+                                      transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                                  ])
     images = []
     targets = []
     for filename in df['filename'].unique():
@@ -76,43 +88,40 @@ def load_data(df, img_dir, img_size=(224, 224)):
         max_detect = 20
         while len(boxes) < max_detect:
             boxes.append([0, 0, 0, 0])
-            labels.append(0)  # Assuming -1 means no object
+            labels.append(0)
         
-        boxes = torch.tensor(boxes, dtype=torch.float32)
-        labels = torch.tensor(labels, dtype=torch.int64)
+        boxes = torch.tensor(boxes, dtype=torch.float32).to(device)
+        labels = torch.tensor(labels, dtype=torch.int64).to(device)
         target = torch.cat((boxes, labels.unsqueeze(1)), dim=1)
         targets.append(target)
     
-    images = torch.stack(images)
-    targets = torch.stack(targets)
+    images = torch.stack(images).to(device)
+    targets = torch.stack(targets).to(device)
 
     return images, targets
 
 def main():
     df = pd.read_csv(r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\annotations.csv')
     img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\images'
-    model = FaceMaskDetection().to(device)
-
-    images, targets = load_data(df, img_dir, (256, 256))
     
-
+    images, targets = load_data(df, img_dir, (224, 224))
     dataset = TensorDataset(images, targets)
     train_size = int(0.7 * len(dataset))
     test_size = len(dataset) - train_size
     train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
-
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
-    model = FaceMaskDetection()
-    criterion = nn.MSELoss()
+    model = FaceMaskDetection().to(device)
+    criterion = nn.MSELoss().to(device)
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     num_epochs = 128
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
-        for i, (inputs, targets) in enumerate(train_loader):
+        for inputs, targets in train_loader:
+            inputs, targets = inputs.to(device), targets.to(device)
             optimizer.zero_grad()
             outputs = model(inputs)
             loss = criterion(outputs, targets)
@@ -121,16 +130,17 @@ def main():
             running_loss += loss.item()
 
         model.eval()
+        test_loss = 0.0
         with torch.no_grad():
-            test_loss = 0.0
             for inputs, targets in test_loader:
+                inputs, targets = inputs.to(device), targets.to(device)
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
                 test_loss += loss.item()
 
         print(f'Epoch {epoch+1}/{num_epochs}, Training Loss: {running_loss/len(train_loader):.4f}, Validation Loss: {test_loss/len(test_loader):.4f}')
 
-    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_1.pth")
+    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_6.pth")
 
 if __name__ == "__main__":
     main()
