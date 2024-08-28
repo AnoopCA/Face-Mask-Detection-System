@@ -1,10 +1,8 @@
-import torch
-import torch.nn as nn
-
 import pandas as pd
 from PIL import Image
+import torch
+import torch.nn as nn
 from torchvision import transforms
-
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset, random_split
 
