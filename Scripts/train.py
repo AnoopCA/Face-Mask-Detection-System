@@ -4,9 +4,11 @@ import torch
 import torch.nn as nn
 from torchvision import transforms
 import torch.optim as optim
-from torch.utils.data import DataLoader, TensorDataset, random_split
+from torch.utils.data import TensorDataset, random_split, DataLoader
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+MAX_DETECT = 20
+NUM_EPOCHS = 128
 
 class FaceMaskDetection(nn.Module):
     def __init__(self):
@@ -14,11 +16,10 @@ class FaceMaskDetection(nn.Module):
         in_channels = 3
         feat_config = [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M']
         in_features = 512 * 7 * 7
-        max_detect = 20
-        classifier_config = [4096, 4096, max_detect * 5]
+        classifier_config = [4096, 4096, MAX_DETECT * 4]
         
         self.features = self._make_features(in_channels, feat_config)
-        self.classifier = self._make_classifier(in_features, classifier_config, max_detect)
+        self.classifier = self._make_classifier(in_features, classifier_config, MAX_DETECT)
 
     def _make_features(self, in_channels, config):
         layers = []
@@ -36,9 +37,9 @@ class FaceMaskDetection(nn.Module):
         layers = []
         for out_features in config:
             layers.append(nn.Linear(in_features=in_features, out_features=out_features))
-            layers.append(nn.ReLU(inplace=True))
-            if out_features != max_detect:
-                layers.append(nn.Dropout(p=0.4))
+            if out_features != max_detect*4:
+                layers.append(nn.ReLU(inplace=True))
+                layers.append(nn.Dropout(p=0.5))
             in_features = out_features
         return nn.Sequential(*layers)
     
@@ -46,7 +47,7 @@ class FaceMaskDetection(nn.Module):
         x = self.features(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
-        x = x.view(x.size(0), 20, 5)
+        x = x.view(x.size(0), MAX_DETECT, 4)
         return x
 
 def load_data(df, img_dir, img_size=(224, 224)):
@@ -78,20 +79,14 @@ def load_data(df, img_dir, img_size=(224, 224)):
             ymin = row['ymin']
             xmax = row['xmax']
             ymax = row['ymax']
-            label = 0 if row['label'] == 'without_mask' else 1
-            
-            boxes.append([xmin / row['width'], ymin / row['height'], xmax / row['width'], ymax / row['height']])
-            labels.append(label)
-        
-        max_detect = 20
-        while len(boxes) < max_detect:
+            if row['label'] != 'without_mask':
+                boxes.append([xmin / row['width'], ymin / row['height'], xmax / row['width'], ymax / row['height']])
+
+        while len(boxes) < MAX_DETECT:
             boxes.append([0, 0, 0, 0])
-            labels.append(0)
         
         boxes = torch.tensor(boxes, dtype=torch.float32).to(device)
-        labels = torch.tensor(labels, dtype=torch.int64).to(device)
-        target = torch.cat((boxes, labels.unsqueeze(1)), dim=1)
-        targets.append(target)
+        targets.append(boxes)
     
     images = torch.stack(images).to(device)
     targets = torch.stack(targets).to(device)
@@ -112,10 +107,9 @@ def main():
 
     model = FaceMaskDetection().to(device)
     criterion = nn.MSELoss().to(device)
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.0001) # 0.001
 
-    num_epochs = 128
-    for epoch in range(num_epochs):
+    for epoch in range(NUM_EPOCHS):
         model.train()
         running_loss = 0.0
         for inputs, targets in train_loader:
@@ -136,9 +130,9 @@ def main():
                 loss = criterion(outputs, targets)
                 test_loss += loss.item()
 
-        print(f'Epoch {epoch+1}/{num_epochs}, Training Loss: {running_loss/len(train_loader):.4f}, Validation Loss: {test_loss/len(test_loader):.4f}')
+        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Training Loss: {running_loss/len(train_loader):.4f}, Validation Loss: {test_loss/len(test_loader):.4f}')
 
-    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_6.pth")
+    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_7.pth")
 
 if __name__ == "__main__":
     main()
