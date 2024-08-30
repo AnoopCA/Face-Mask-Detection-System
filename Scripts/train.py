@@ -16,7 +16,7 @@ class FaceMaskDetection(nn.Module):
         in_channels = 3
         feat_config = [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M']
         in_features = 512 * 7 * 7
-        classifier_config = [4096, 4096, MAX_DETECT * 4]
+        classifier_config = [4096, 4096, MAX_DETECT * 5]
         
         self.features = self._make_features(in_channels, feat_config)
         self.classifier = self._make_classifier(in_features, classifier_config, MAX_DETECT)
@@ -37,7 +37,7 @@ class FaceMaskDetection(nn.Module):
         layers = []
         for out_features in config:
             layers.append(nn.Linear(in_features=in_features, out_features=out_features))
-            if out_features != max_detect*4:
+            if out_features != max_detect*5:
                 layers.append(nn.ReLU(inplace=True))
                 layers.append(nn.Dropout(p=0.5))
             in_features = out_features
@@ -47,7 +47,7 @@ class FaceMaskDetection(nn.Module):
         x = self.features(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
-        x = x.view(x.size(0), MAX_DETECT, 4)
+        x = x.view(x.size(0), MAX_DETECT, 5)
         return x
 
 def load_data(df, img_dir, img_size=(224, 224)):
@@ -79,14 +79,21 @@ def load_data(df, img_dir, img_size=(224, 224)):
             ymin = row['ymin']
             xmax = row['xmax']
             ymax = row['ymax']
+            label = 0 if row['label'] == 'without_mask' else 1
             if row['label'] != 'without_mask':
                 boxes.append([xmin / row['width'], ymin / row['height'], xmax / row['width'], ymax / row['height']])
+            else:
+                boxes.append([0, 0, 0, 0])
+            labels.append(label)
 
         while len(boxes) < MAX_DETECT:
             boxes.append([0, 0, 0, 0])
+            labels.append(0)
         
         boxes = torch.tensor(boxes, dtype=torch.float32).to(device)
-        targets.append(boxes)
+        labels = torch.tensor(labels, dtype=torch.int64).to(device)
+        target = torch.cat((boxes, labels.unsqueeze(1)), dim=1)
+        targets.append(target)
     
     images = torch.stack(images).to(device)
     targets = torch.stack(targets).to(device)
@@ -132,7 +139,7 @@ def main():
 
         print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Training Loss: {running_loss/len(train_loader):.4f}, Validation Loss: {test_loss/len(test_loader):.4f}')
 
-    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_7.pth")
+    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_8.pth")
 
 if __name__ == "__main__":
     main()
