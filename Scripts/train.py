@@ -53,16 +53,19 @@ class FaceMaskDetection(nn.Module):
 def load_data(df, img_dir, img_size=(224, 224)):
     transform = transforms.Compose([
                                       transforms.Resize(img_size),
-                                      transforms.RandomHorizontalFlip(p=0.5),
-                                      transforms.RandomVerticalFlip(p=0.5),
-                                      transforms.RandomRotation(degrees=30),
-                                      transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
-                                      transforms.RandomAffine(degrees=0, translate=(0.1, 0.1), scale=(0.8, 1.2), shear=10),
-                                      transforms.RandomGrayscale(p=0.1),
-                                      transforms.RandomPerspective(distortion_scale=0.2, p=0.5),
+
                                       transforms.ToTensor(),
-                                      transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                                      transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
                                   ])
+
+#                                      transforms.RandomHorizontalFlip(p=0.5),
+#                                      transforms.RandomVerticalFlip(p=0.5),
+#                                      transforms.RandomRotation(degrees=30),
+#                                      transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+#                                      transforms.RandomAffine(degrees=0, translate=(0.1, 0.1), scale=(0.8, 1.2), shear=10),
+#                                      transforms.RandomGrayscale(p=0.1),
+#                                      transforms.RandomPerspective(distortion_scale=0.2, p=0.5),
+
     images = []
     targets = []
     for filename in df['filename'].unique():
@@ -136,10 +139,10 @@ def main():
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
                 test_loss += loss.item()
+        if (epoch+1) % 16 == 0:
+            print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Training Loss: {running_loss/len(train_loader):.4f}, Validation Loss: {test_loss/len(test_loader):.4f}')
 
-        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Training Loss: {running_loss/len(train_loader):.4f}, Validation Loss: {test_loss/len(test_loader):.4f}')
-
-    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_8.pth")
+    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_11.pth")
 
 if __name__ == "__main__":
     main()
