@@ -1,21 +1,51 @@
+import numpy as np
 import os
 import torch
 import cv2
-from torch.utils.data import TensorDataset, DataLoader
+from torchvision import transforms
+from PIL import Image
 from train import FaceMaskDetection
+import pandas as pd
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-image_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images'
-model_path = r'D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_7.pth'
+THRESHOLD = 0.01
 
-test_images = TensorDataset(image_dir)
-test_data = DataLoader(dataset=test_images, batch_size=32)
+img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images'
+img_out = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_output'
+model_path = r'D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_9.pth'
 
 model = FaceMaskDetection()
 model.load_state_dict(torch.load(model_path, map_location=device))
 model.to(device)
 model.eval()
 
-with torch.no_grad:
-    for inputs in test_data:
-        outputs = model(inputs)
+transform = transforms.Compose([
+                                 transforms.Resize((224, 224)),
+                                 transforms.ToTensor(),
+                                 transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+                              ])
+
+df = pd.read_csv(r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\annotations.csv')
+
+for img_name in os.listdir(img_dir):
+    img_path = os.path.join(img_dir, img_name)
+    img = Image.open(img_path).convert("RGB")
+    original_img = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2RGB)
+    img = transform(img)
+    img = img.unsqueeze(0)
+    img = img.to(device)
+    results = model(img)
+    for result in results:
+        for r in result:
+            x1, y1, x2, y2, score = r
+            if score > 0.001:
+                x1 = int(x1 * original_img.shape[1])
+                y1 = int(y1 * original_img.shape[0])
+                x2 = int(x2 * original_img.shape[1])
+                y2 = int(y2 * original_img.shape[0])
+                cv2.rectangle(original_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    cv2.imshow("Prediction", original_img)
+    cv2.waitKey(2000)
+
+    #output_img_path = os.path.join(img_out, f"output_{img_name}")
+    #cv2.imwrite(output_img_path, original_img)
