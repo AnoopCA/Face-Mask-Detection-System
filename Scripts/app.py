@@ -12,7 +12,7 @@ THRESHOLD = 0.01
 
 img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images'
 img_out = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_output'
-model_path = r'D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_9.pth'
+model_path = r'D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_12.pth'
 
 model = FaceMaskDetection()
 model.load_state_dict(torch.load(model_path, map_location=device))
@@ -34,7 +34,7 @@ for img_name in os.listdir(img_dir):
     img = transform(img)
     img = img.unsqueeze(0)
     img = img.to(device)
-    results = model(img)
+    results = model(img).to(device)
     for result in results:
         for r in result:
             x1, y1, x2, y2, score = r
@@ -43,7 +43,7 @@ for img_name in os.listdir(img_dir):
                 y1 = int(y1 * original_img.shape[0])
                 x2 = int(x2 * original_img.shape[1])
                 y2 = int(y2 * original_img.shape[0])
-                cv2.rectangle(original_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.rectangle(original_img, (x1, y1), (x2, y2), (0, 255, 0), 1)
     cv2.imshow("Prediction", original_img)
     cv2.waitKey(2000)
 

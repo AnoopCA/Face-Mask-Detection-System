@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import cv2
 
-
 image_path = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\images'
 image_name = 'maksssksksss737.png'
 image = cv2.imread(os.path.join(image_path, image_name))

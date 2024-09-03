@@ -1,3 +1,4 @@
+import datetime
 import pandas as pd
 from PIL import Image
 import torch
@@ -8,7 +9,9 @@ from torch.utils.data import TensorDataset, random_split, DataLoader
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 MAX_DETECT = 20
-NUM_EPOCHS = 128
+NUM_EPOCHS = 1024
+
+start_time = datetime.datetime.now()
 
 class FaceMaskDetection(nn.Module):
     def __init__(self):
@@ -53,7 +56,6 @@ class FaceMaskDetection(nn.Module):
 def load_data(df, img_dir, img_size=(224, 224)):
     transform = transforms.Compose([
                                       transforms.Resize(img_size),
-
                                       transforms.ToTensor(),
                                       transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
                                   ])
@@ -109,7 +111,7 @@ def main():
     
     images, targets = load_data(df, img_dir, (224, 224))
     dataset = TensorDataset(images, targets)
-    train_size = int(0.7 * len(dataset))
+    train_size = int(0.97 * len(dataset))
     test_size = len(dataset) - train_size
     train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
@@ -139,10 +141,11 @@ def main():
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
                 test_loss += loss.item()
-        if (epoch+1) % 16 == 0:
-            print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Training Loss: {running_loss/len(train_loader):.4f}, Validation Loss: {test_loss/len(test_loader):.4f}')
+        #if (epoch+1) % 16 == 0:
+        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Training Loss: {running_loss/len(train_loader):.4f}, Validation Loss: {test_loss/len(test_loader):.4f}')
 
-    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_11.pth")
+    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_13.pth")
 
 if __name__ == "__main__":
     main()
+    print(f"Processing time: {datetime.datetime.now()-start_time}")
