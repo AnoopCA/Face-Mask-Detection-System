@@ -8,7 +8,7 @@ from train import FaceMaskDetection
 import pandas as pd
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-THRESHOLD = 0.01
+THRESHOLD = 0.04
 
 img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images'
 img_out = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_output'
