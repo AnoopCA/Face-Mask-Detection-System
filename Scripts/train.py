@@ -17,9 +17,11 @@ class FaceMaskDetection(nn.Module):
     def __init__(self):
         super(FaceMaskDetection, self).__init__()
         in_channels = 3
-        feat_config = [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M']
+        #feat_config = [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M']
+        feat_config = [64, 64, 64, 'M', 128, 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M']
         in_features = 512 * 7 * 7
-        classifier_config = [4096, 4096, MAX_DETECT * 5]
+        #classifier_config = [4096, 4096, MAX_DETECT * 5]
+        classifier_config = [4096, 4096, 2048, 1024, MAX_DETECT * 5]
         
         self.features = self._make_features(in_channels, feat_config)
         self.classifier = self._make_classifier(in_features, classifier_config, MAX_DETECT)
@@ -33,7 +35,7 @@ class FaceMaskDetection(nn.Module):
                 layers.append(nn.Conv2d(in_channels=in_channels, out_channels=layer, kernel_size=3, padding=1))
                 layers.append(nn.ReLU(inplace=True))
                 in_channels = layer
-        layers.append(nn.AvgPool2d(kernel_size=1, stride=1))
+        #layers.append(nn.AvgPool2d(kernel_size=1, stride=1))
         return nn.Sequential(*layers)
     
     def _make_classifier(self, in_features, config, max_detect):
@@ -144,7 +146,7 @@ def main():
         #if (epoch+1) % 16 == 0:
         print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Training Loss: {running_loss/len(train_loader):.4f}, Validation Loss: {test_loss/len(test_loader):.4f}')
 
-    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_13.pth")
+    torch.save(model.state_dict(), r"D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_15.pth")
 
 if __name__ == "__main__":
     main()
