@@ -10,9 +10,12 @@ import pandas as pd
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 THRESHOLD = 0.04
 
-img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images'
-img_out = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_output'
+#img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images'
+img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\to test_images - Other Images'
+#img_out = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_output'
 model_path = r'D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_12.pth'
+#model_path = r'D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_13_e128_No_AvgPool.pth'
+#model_path = r'D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_14_e128_AvgPool.pth'
 
 model = FaceMaskDetection()
 model.load_state_dict(torch.load(model_path, map_location=device))
@@ -25,7 +28,7 @@ transform = transforms.Compose([
                                  transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
                               ])
 
-df = pd.read_csv(r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\annotations.csv')
+#df = pd.read_csv(r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\annotations.csv')
 
 for img_name in os.listdir(img_dir):
     img_path = os.path.join(img_dir, img_name)
