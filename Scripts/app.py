@@ -12,9 +12,7 @@ THRESHOLD = 0.04
 
 #img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images'
 img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\to test_images - Other Images'
-#img_out = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_output'
-#model_path = r'D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_12_e1024.pth'
-model_path = r'D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_16_e512.pth'
+model_path = r'D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_12_e1024.pth'
 
 model = FaceMaskDetection()
 model.load_state_dict(torch.load(model_path, map_location=device))
