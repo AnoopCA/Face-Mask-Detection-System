@@ -9,7 +9,7 @@ from torch.utils.data import TensorDataset, random_split, DataLoader
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 MAX_DETECT = 20
-NUM_EPOCHS = 2048 #1024
+NUM_EPOCHS = 1024
 
 start_time = datetime.datetime.now()
 
