@@ -4,3 +4,5 @@ References/
 Models/
 Scripts/__pycache__/
 Models/model_Info.txt
+YOLOv3/Models/
+YOLOv3/PASCAL_VOC/
