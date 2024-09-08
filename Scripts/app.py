@@ -1,26 +1,37 @@
 import numpy as np
+import pandas as pd
 import os
+import sys
 import torch
 import cv2
 from torchvision import transforms
 from PIL import Image
 from train import FaceMaskDetection
-import pandas as pd
+
+sys.path.append(os.path.abspath(r"D:\ML_Projects\Face-Mask-Detection-System\References\YOLOv3"))
+from model import YOLOv3
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 THRESHOLD = 0.04
 
 #img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\validation_images'
 img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images'
-model_path = r'D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_12_e1024.pth'
+#model_path = r'D:\ML_Projects\Face-Mask-Detection-System\Models\fmd_12_e1024.pth'
+model_path = r'D:\ML_Projects\Face-Mask-Detection-System\References\YOLOv3\Models\fmd_yolov3_2.pth.tar'
 
-model = FaceMaskDetection()
-model.load_state_dict(torch.load(model_path, map_location=device))
+#model = FaceMaskDetection()
+model = YOLOv3()
+print(model)
+
+checkpoint = torch.load(model_path, map_location=device)
+model.load_state_dict(checkpoint['state_dict'])
+
+#model.load_state_dict(torch.load(model_path, map_location=device))
 model.to(device)
 model.eval()
 
 transform = transforms.Compose([
-                                 transforms.Resize((224, 224)),
+                                 transforms.Resize((416, 416)),
                                  transforms.ToTensor(),
                                  transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
                               ])
