@@ -29,7 +29,7 @@ class YOLODataset(Dataset):
         img_dir,
         label_dir,
         anchors,
-        image_size=416,
+        image_size=config.IMAGE_SIZE, #416,
         S=[13, 26, 52],
         C=20,
         transform=None,

@@ -4,6 +4,7 @@ Implementation of YOLOv3 architecture
 
 import torch
 import torch.nn as nn
+import config as config_imported
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -169,7 +170,7 @@ class YOLOv3(nn.Module):
 
 if __name__ == "__main__":
     num_classes = 20
-    IMAGE_SIZE = 416
+    IMAGE_SIZE = config_imported.IMAGE_SIZE #224 #416
     model = YOLOv3(num_classes=num_classes)
     x = torch.randn((2, 3, IMAGE_SIZE, IMAGE_SIZE))
     out = model(x)
