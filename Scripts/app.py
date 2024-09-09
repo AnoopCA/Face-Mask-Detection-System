@@ -21,7 +21,6 @@ model_path = r'D:\ML_Projects\Face-Mask-Detection-System\References\YOLOv3\Model
 
 #model = FaceMaskDetection()
 model = YOLOv3()
-print(model)
 
 checkpoint = torch.load(model_path, map_location=device)
 model.load_state_dict(checkpoint['state_dict'])

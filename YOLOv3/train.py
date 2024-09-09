@@ -12,6 +12,9 @@ from tqdm import tqdm
 import warnings
 warnings.filterwarnings('ignore')
 
+import datetime
+start_time = datetime.datetime.now()
+
 from utils import (
     mean_average_precision,
     cells_to_bboxes,
@@ -23,8 +26,6 @@ from utils import (
 )
 
 from loss import YoloLoss
-import warnings
-warnings.filterwarnings("ignore")
 
 torch.backends.cudnn.benchmark = True
 
@@ -85,28 +86,30 @@ def main():
     for epoch in range(config.NUM_EPOCHS):
         train_fn(train_loader, model, optimizer, loss_fn, scaler, scaled_anchors)
 
-        if config.SAVE_MODEL:
-            save_checkpoint(model, optimizer, filename=r"D:\ML_Projects\Face-Mask-Detection-System\References\YOLOv3\Models\fmd_yolov3_2.pth.tar")
+        #if epoch > 0 and epoch % 3 == 0:
+        check_class_accuracy(model, test_loader, threshold=config.CONF_THRESHOLD)
+        pred_boxes, true_boxes = get_evaluation_bboxes(
+            test_loader,
+            model,
+            iou_threshold=config.NMS_IOU_THRESH,
+            anchors=config.ANCHORS,
+            threshold=config.CONF_THRESHOLD,
+        )
+        mapval = mean_average_precision(
+            pred_boxes,
+            true_boxes,
+            iou_threshold=config.MAP_IOU_THRESH,
+            box_format="midpoint",
+            num_classes=config.NUM_CLASSES,
+        )
+        print(f"MAP: {mapval.item()}")
+        model.train()
 
-        if epoch > 0 and epoch % 3 == 0:
-            check_class_accuracy(model, test_loader, threshold=config.CONF_THRESHOLD)
-            pred_boxes, true_boxes = get_evaluation_bboxes(
-                test_loader,
-                model,
-                iou_threshold=config.NMS_IOU_THRESH,
-                anchors=config.ANCHORS,
-                threshold=config.CONF_THRESHOLD,
-            )
-            mapval = mean_average_precision(
-                pred_boxes,
-                true_boxes,
-                iou_threshold=config.MAP_IOU_THRESH,
-                box_format="midpoint",
-                num_classes=config.NUM_CLASSES,
-            )
-            print(f"MAP: {mapval.item()}")
-            model.train()
+    if config.SAVE_MODEL:
+        save_checkpoint(model, optimizer, filename=r"D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_5.pth.tar")
 
 
 if __name__ == "__main__":
     main()
+    print(f"Processing time: {datetime.datetime.now()-start_time}")
+
