@@ -17,7 +17,6 @@ start_time = datetime.datetime.now()
 
 from utils import (
     mean_average_precision,
-    cells_to_bboxes,
     get_evaluation_bboxes,
     check_class_accuracy,
     get_loaders,
@@ -30,8 +29,8 @@ from loss import YoloLoss
 torch.backends.cudnn.benchmark = True
 
 
-def train_fn(train_loader, model, optimizer, loss_fn, scaler, scaled_anchors):
-    loop = tqdm(train_loader, leave=True)
+def train_fn(train_loader, model, optimizer, loss_fn, scaler, scaled_anchors, epoch):
+    loop = tqdm(train_loader, leave=True, desc=f"Training batches in the epoch {epoch+1}")
     losses = []
     for batch_idx, (x, y) in enumerate(loop):
         x = x.to(config.DEVICE)
@@ -75,7 +74,7 @@ def main():
 
     if config.LOAD_MODEL:
         load_checkpoint(
-            config.CHECKPOINT_FILE, model, optimizer, config.LEARNING_RATE
+            config.LOAD_MODEL_NAME, model, optimizer, config.LEARNING_RATE
         )
 
     scaled_anchors = (
@@ -84,29 +83,29 @@ def main():
     ).to(config.DEVICE)
 
     for epoch in range(config.NUM_EPOCHS):
-        train_fn(train_loader, model, optimizer, loss_fn, scaler, scaled_anchors)
+        train_fn(train_loader, model, optimizer, loss_fn, scaler, scaled_anchors, epoch)
 
-        #if epoch > 0 and epoch % 3 == 0:
-        check_class_accuracy(model, test_loader, threshold=config.CONF_THRESHOLD)
-        pred_boxes, true_boxes = get_evaluation_bboxes(
-            test_loader,
-            model,
-            iou_threshold=config.NMS_IOU_THRESH,
-            anchors=config.ANCHORS,
-            threshold=config.CONF_THRESHOLD,
-        )
-        mapval = mean_average_precision(
-            pred_boxes,
-            true_boxes,
-            iou_threshold=config.MAP_IOU_THRESH,
-            box_format="midpoint",
-            num_classes=config.NUM_CLASSES,
-        )
-        print(f"MAP: {mapval.item()}")
-        model.train()
+        if (epoch+1) % config.PRINT_METRIC == 0:
+            check_class_accuracy(model, test_loader, threshold=config.CONF_THRESHOLD)
+            pred_boxes, true_boxes = get_evaluation_bboxes(
+                test_loader,
+                model,
+                iou_threshold=config.NMS_IOU_THRESH,
+                anchors=config.ANCHORS,
+                threshold=config.CONF_THRESHOLD,
+            )
+            mapval = mean_average_precision(
+                pred_boxes,
+                true_boxes,
+                iou_threshold=config.MAP_IOU_THRESH,
+                box_format="midpoint",
+                num_classes=config.NUM_CLASSES,
+            )
+            print(f"MAP: {mapval.item()}")
+            model.train()
 
-    if config.SAVE_MODEL:
-        save_checkpoint(model, optimizer, filename=r"D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_5.pth.tar")
+            if config.SAVE_MODEL:
+                save_checkpoint(model, optimizer, filename=config.SAVE_MODEL_NAME)
 
 
 if __name__ == "__main__":

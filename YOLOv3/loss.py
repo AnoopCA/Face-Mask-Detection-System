@@ -1,7 +1,6 @@
 """
 Implementation of Yolo Loss Function
 """
-import random
 import torch
 import torch.nn as nn
 

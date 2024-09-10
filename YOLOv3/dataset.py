@@ -1,5 +1,5 @@
 """
-Creates a Pytorch dataset to load the Pascal VOC & MS COCO datasets
+Creates a Pytorch dataset to load the Pascal VOC datasets
 """
 
 import config
@@ -15,7 +15,6 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from utils import (
-    cells_to_bboxes,
     iou_width_height as iou,
     non_max_suppression as nms
 )
@@ -31,7 +30,7 @@ class YOLODataset(Dataset):
         anchors,
         image_size=config.IMAGE_SIZE, #416,
         S=[13, 26, 52],
-        C=20,
+        C=config.NUM_CLASSES,
         transform=None,
     ):
         self.annotations = pd.read_csv(csv_file)

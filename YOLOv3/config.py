@@ -9,23 +9,25 @@ warnings.filterwarnings('ignore')
 
 DATASET = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\PASCAL_VOC'
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-NUM_WORKERS = 4
+NUM_WORKERS = 10 #4
 BATCH_SIZE = 128 #16
 IMAGE_SIZE = 224 #416
-NUM_CLASSES = 20
+NUM_CLASSES = 20 #PASCAL VOC label format - "class" "x-center" "y-center" "width" "height"
 LEARNING_RATE = 1e-4 #1e-5
 WEIGHT_DECAY = 1e-4
-NUM_EPOCHS = 4 #100
-CONF_THRESHOLD = 0.05
-MAP_IOU_THRESH = 0.5
-NMS_IOU_THRESH = 0.45
+NUM_EPOCHS = 4 #32 #100
+CONF_THRESHOLD = 0.55 #0.5 #0.05
+MAP_IOU_THRESH = 0.55 #0.5
+NMS_IOU_THRESH = 0.55 #0.45
 S = [IMAGE_SIZE // 32, IMAGE_SIZE // 16, IMAGE_SIZE // 8]
 PIN_MEMORY = True
-LOAD_MODEL = False
 SAVE_MODEL = True
-CHECKPOINT_FILE = "checkpoint.pth.tar"
+SAVE_MODEL_NAME = r"D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_6.pth.tar"
+LOAD_MODEL = False
+LOAD_MODEL_NAME = r"D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_5.pth.tar"
 IMG_DIR = DATASET + "/images/"
 LABEL_DIR = DATASET + "/labels/"
+PRINT_METRIC = 2 #8
 
 ANCHORS = [
     [(0.28, 0.22), (0.38, 0.48), (0.9, 0.78)],
@@ -48,14 +50,12 @@ train_transforms = A.Compose(
         A.ColorJitter(brightness=0.6, contrast=0.6, saturation=0.6, hue=0.6, p=0.4),
         A.OneOf(
             [
-                A.ShiftScaleRotate(
-                    rotate_limit=20, p=0.5, border_mode=cv2.BORDER_CONSTANT
-                ),
+                A.ShiftScaleRotate(rotate_limit=20, p=0.5, border_mode=cv2.BORDER_CONSTANT),
                 A.Affine(shear=15, p=0.5, mode=cv2.BORDER_CONSTANT),
             ],
-            p=1.0,
+            p=0.1, #1.0,
         ),
-        A.HorizontalFlip(p=0.5),
+        A.HorizontalFlip(p=0.1),
         A.Blur(p=0.1),
         A.CLAHE(p=0.1),
         A.Posterize(p=0.1),
