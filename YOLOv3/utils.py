@@ -1,14 +1,7 @@
 import config
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import numpy as np
-import os
-import random
 import torch
-
 from collections import Counter
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -119,7 +112,7 @@ def non_max_suppression(bboxes, iou_threshold, threshold, box_format="corners"):
 
 
 def mean_average_precision(
-    pred_boxes, true_boxes, iou_threshold=0.5, box_format="midpoint", num_classes=20
+    pred_boxes, true_boxes, iou_threshold=0.5, box_format="midpoint", num_classes=config.NUM_CLASSES
 ):
     """
     This function calculates mean average precision (mAP)
@@ -233,7 +226,8 @@ def get_evaluation_bboxes(
     train_idx = 0
     all_pred_boxes = []
     all_true_boxes = []
-    for batch_idx, (x, labels) in enumerate(tqdm(loader)):
+    #for batch_idx, (x, labels) in enumerate(tqdm(loader, desc="Batches in bounding box evaluation")):
+    for batch_idx, (x, labels) in enumerate(loader):
         x = x.to(device)
 
         with torch.no_grad():
@@ -321,7 +315,8 @@ def check_class_accuracy(model, loader, threshold):
     tot_noobj, correct_noobj = 0, 0
     tot_obj, correct_obj = 0, 0
 
-    for idx, (x, y) in enumerate(tqdm(loader)):
+    #for idx, (x, y) in enumerate(tqdm(loader, desc="Calculating class accuracy")):
+    for idx, (x, y) in enumerate(loader):
         x = x.to(config.DEVICE)
         with torch.no_grad():
             out = model(x)
