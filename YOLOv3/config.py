@@ -7,12 +7,13 @@ from albumentations.pytorch import ToTensorV2
 import warnings
 warnings.filterwarnings('ignore')
 
-DATASET = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\PASCAL_VOC'
+#DATASET = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\PASCAL_VOC'
+DATASET = r"D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 NUM_WORKERS = 10 #4
 BATCH_SIZE = 128 #16
 IMAGE_SIZE = 224 #416
-NUM_CLASSES = 20 #PASCAL VOC label format - "class" "x-center" "y-center" "width" "height"
+NUM_CLASSES = 2 #20 #PASCAL VOC label format - "class" "x-center" "y-center" "width" "height"
 LEARNING_RATE = 1e-4 #1e-5
 WEIGHT_DECAY = 1e-4
 NUM_EPOCHS = 4 #32 #100
@@ -26,8 +27,13 @@ SAVE_MODEL_NAME = r"D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_
 LOAD_MODEL = False
 LOAD_MODEL_NAME = r"D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_5.pth.tar"
 IMG_DIR = DATASET + "/images/"
-LABEL_DIR = DATASET + "/labels/"
-PRINT_METRIC = 2 #8
+#LABEL_DIR = DATASET + "/labels/"
+PRINT_METRIC = NUM_EPOCHS / NUM_EPOCHS #8
+TRAIN_FILE = "/annotations - PASCAL VOC format.csv"
+TEST_FILE = "/annotations - PASCAL VOC format.csv"
+TRAIN_IMG_NAMES = DATASET + "/image names.csv"
+TEST_IMG_NAMES = DATASET + "/image names.csv"
+EVAL_IMG_NAMES = DATASET + "/image names.csv"
 
 ANCHORS = [
     [(0.28, 0.22), (0.38, 0.48), (0.9, 0.78)],

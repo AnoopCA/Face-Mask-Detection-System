@@ -24,18 +24,20 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 class YOLODataset(Dataset):
     def __init__(
         self,
-        csv_file,
+        csv_file_annot,
         img_dir,
-        label_dir,
+#        label_dir,
+        csv_file_img,
         anchors,
         image_size=config.IMAGE_SIZE, #416,
         S=[13, 26, 52],
         C=config.NUM_CLASSES,
         transform=None,
     ):
-        self.annotations = pd.read_csv(csv_file)
+        self.annotations = pd.read_csv(csv_file_annot)
         self.img_dir = img_dir
-        self.label_dir = label_dir
+ #       self.label_dir = label_dir
+        self.img_names = pd.read_csv(csv_file_img)
         self.image_size = image_size
         self.transform = transform
         self.S = S
@@ -49,9 +51,13 @@ class YOLODataset(Dataset):
         return len(self.annotations)
 
     def __getitem__(self, index):
-        label_path = os.path.join(self.label_dir, self.annotations.iloc[index, 1])
-        bboxes = np.roll(np.loadtxt(fname=label_path, delimiter=" ", ndmin=2), 4, axis=1).tolist()
-        img_path = os.path.join(self.img_dir, self.annotations.iloc[index, 0])
+  #      label_path = os.path.join(self.label_dir, self.annotations.iloc[index, 1])
+  #      bboxes = np.roll(np.loadtxt(fname=label_path, delimiter=" ", ndmin=2), 4, axis=1).tolist()
+        bboxes = np.roll(self.annotations[self.annotations['filename']==self.img_names[index]].iloc[:,1:].values, 4, axis=1).tolist()
+
+        print(f"bboxes: {bboxes}")
+#        img_path = os.path.join(self.img_dir, self.annotations.iloc[index, 0])
+        img_path = os.path.join(self.img_dir, self.img_names[index])
         image = np.array(Image.open(img_path).convert("RGB"))
 
         if self.transform:
