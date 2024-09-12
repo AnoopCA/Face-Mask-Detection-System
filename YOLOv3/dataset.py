@@ -24,17 +24,19 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 class YOLODataset(Dataset):
     def __init__(
         self,
-        csv_file_annot,
+#        csv_file_annot,
+        csv_file_img,
         img_dir,
 #        label_dir,
-        csv_file_img,
         anchors,
         image_size=config.IMAGE_SIZE, #416,
         S=[13, 26, 52],
         C=config.NUM_CLASSES,
         transform=None,
     ):
-        self.annotations = pd.read_csv(csv_file_annot)
+        #self.annotations = pd.read_csv(csv_file_annot)
+        self.annotations = pd.read_csv(config.DATASET + config.TRAIN_FILE)
+        #self.annotations = pd.read_csv(csv_file_img)
         self.img_dir = img_dir
  #       self.label_dir = label_dir
         self.img_names = pd.read_csv(csv_file_img)
@@ -48,7 +50,8 @@ class YOLODataset(Dataset):
         self.ignore_iou_thresh = 0.5
 
     def __len__(self):
-        return len(self.annotations)
+        #return len(self.annotations)
+        return len(self.img_names)
 
     def __getitem__(self, index):
   #      label_path = os.path.join(self.label_dir, self.annotations.iloc[index, 1])
@@ -95,4 +98,6 @@ class YOLODataset(Dataset):
                 elif not anchor_taken and iou_anchors[anchor_idx] > self.ignore_iou_thresh:
                     targets[scale_idx][anchor_on_scale, i, j, 0] = -1  # ignore prediction
 
+        print(len(f"image len: {image}"))
+        print(len(f"targets len: {targets}"))
         return image, tuple(targets)
