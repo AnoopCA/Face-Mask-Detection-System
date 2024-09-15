@@ -34,11 +34,11 @@ class YOLODataset(Dataset):
         C=config.NUM_CLASSES,
         transform=None,
     ):
-        #self.annotations = pd.read_csv(csv_file_annot)
+#        self.annotations = pd.read_csv(csv_file_annot)
         self.annotations = pd.read_csv(config.DATASET + config.TRAIN_FILE)
-        #self.annotations = pd.read_csv(csv_file_img)
+#        self.annotations = pd.read_csv(csv_file_img)
         self.img_dir = img_dir
- #       self.label_dir = label_dir
+#        self.label_dir = label_dir
         self.img_names = pd.read_csv(csv_file_img)
         self.image_size = image_size
         self.transform = transform
@@ -50,12 +50,12 @@ class YOLODataset(Dataset):
         self.ignore_iou_thresh = 0.5
 
     def __len__(self):
-        #return len(self.annotations)
+#        return len(self.annotations)
         return len(self.img_names)
 
     def __getitem__(self, index):
-  #      label_path = os.path.join(self.label_dir, self.annotations.iloc[index, 1])
-  #      bboxes = np.roll(np.loadtxt(fname=label_path, delimiter=" ", ndmin=2), 4, axis=1).tolist()
+#        label_path = os.path.join(self.label_dir, self.annotations.iloc[index, 1])
+#        bboxes = np.roll(np.loadtxt(fname=label_path, delimiter=" ", ndmin=2), 4, axis=1).tolist()
         bboxes = np.roll(self.annotations[self.annotations['filename']==self.img_names[index]].iloc[:,1:].values, 4, axis=1).tolist()
 
         print(f"bboxes: {bboxes}")
