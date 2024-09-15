@@ -359,8 +359,8 @@ def load_checkpoint(checkpoint_file, model, optimizer, lr):
     optimizer.load_state_dict(checkpoint["optimizer"])
 
     # If we don't do this then it will just have learning rate of old checkpoint and it will lead to many hours of debugging \:
-#    for param_group in optimizer.param_groups:
-#        param_group["lr"] = lr
+    #for param_group in optimizer.param_groups:
+    #   param_group["lr"] = lr
 
 
 def get_loaders(train_csv_path, test_csv_path):
@@ -408,7 +408,7 @@ def get_loaders(train_csv_path, test_csv_path):
         transform=config.test_transforms,
         S=[IMAGE_SIZE // 32, IMAGE_SIZE // 16, IMAGE_SIZE // 8],
         img_dir=config.IMG_DIR,
- #       label_dir=config.LABEL_DIR,
+#        label_dir=config.LABEL_DIR,
         anchors=config.ANCHORS,
     )
     train_eval_loader = DataLoader(
