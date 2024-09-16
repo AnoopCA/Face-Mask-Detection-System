@@ -30,8 +30,8 @@ torch.backends.cudnn.benchmark = True
 
 
 def train_fn(train_loader, model, optimizer, loss_fn, scaler, scaled_anchors, epoch):
-    loop = tqdm(train_loader, leave=True, desc=f"Training batches in the epoch {epoch+1}")
-    print(len(f"train loader len: {len(train_loader)}"))
+    loop = tqdm(train_loader, leave=True, desc=f"Training batches in the epoch {epoch+1}/{config.NUM_EPOCHS}")
+    print(f"\n train loader len: {len(train_loader)}")
     losses = []
     for batch_idx, (x, y) in enumerate(loop):
         x = x.to(config.DEVICE)
