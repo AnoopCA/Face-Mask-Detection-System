@@ -61,7 +61,6 @@ class YOLODataset(Dataset):
         bboxes = np.roll(self.annotations[self.annotations['filename']==self.img_names.iloc[index][0]].iloc[:,1:].values, 4, axis=1).tolist()
         print(f"bboxes: {bboxes}")
 
-#        print(f"bboxes: {bboxes}")
 #        img_path = os.path.join(self.img_dir, self.annotations.iloc[index, 0])
         img_path = os.path.join(self.img_dir, self.img_names.iloc[index][0])
         image = np.array(Image.open(img_path).convert("RGB"))
@@ -101,6 +100,6 @@ class YOLODataset(Dataset):
                 elif not anchor_taken and iou_anchors[anchor_idx] > self.ignore_iou_thresh:
                     targets[scale_idx][anchor_on_scale, i, j, 0] = -1  # ignore prediction
 
-        print(len(f"image len: {image}"))
-        print(len(f"targets len: {targets}"))
+        #print(f"image: {image}")
+        #print(f"targets: {targets}")
         return image, tuple(targets)
