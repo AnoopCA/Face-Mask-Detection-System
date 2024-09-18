@@ -370,7 +370,7 @@ def get_loaders(train_csv_path, test_csv_path):
     train_dataset = YOLODataset(
         train_csv_path,
 #        csv_file_img = config.TRAIN_IMG_NAMES,
-        transform=config.train_transforms,
+        transform=config.test_transforms, #config.train_transforms,
         S=[IMAGE_SIZE // 32, IMAGE_SIZE // 16, IMAGE_SIZE // 8],
         img_dir=config.IMG_DIR,
 #        label_dir=config.LABEL_DIR,

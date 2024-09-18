@@ -1,0 +1,33 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: train.py",
+            "type": "python",
+            "request": "launch",
+            "program": "D:/ML_Projects/Face-Mask-Detection-System/YOLOv3/train.py",  // Full path to the train.py file
+            "console": "integratedTerminal",
+            "cwd": "D:/ML_Projects/Face-Mask-Detection-System/YOLOv3",  // Set the working directory
+            "env": {
+                "MY_ENV_VAR": "value"        // Add environment variables as needed
+            },
+            "args": [],                      // Add any command-line arguments for train.py, if necessary
+            "justMyCode": true               // Set to true to focus on your own code
+        },
+        {
+            "name": "Python Debugger: Any file in YOLOv3",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",            // Allows debugging of any Python file within the workspace
+            "console": "integratedTerminal",
+            "cwd": "D:/ML_Projects/Face-Mask-Detection-System/YOLOv3",  // Set the working directory for other Python files
+            "env": {
+                "MY_ENV_VAR": "value"        // Environment variables (optional)
+            },
+            "justMyCode": true               // Focus on your own code during debugging
+        }
+    ]
+}
