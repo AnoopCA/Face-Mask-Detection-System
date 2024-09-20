@@ -10,7 +10,7 @@ warnings.filterwarnings('ignore')
 #DATASET = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\PASCAL_VOC'
 DATASET = r"D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-NUM_WORKERS = 10 #4
+NUM_WORKERS = 0 #10
 BATCH_SIZE = 128 #16
 IMAGE_SIZE = 224 #416
 NUM_CLASSES = 2 #20 #PASCAL VOC label format - "class" "x-center" "y-center" "width" "height"
@@ -43,7 +43,7 @@ ANCHORS = [
 
 
 scale = 1.1
-train_transforms = A.Compose(
+train_transforms_1 = A.Compose(
     [
         A.LongestMaxSize(max_size=int(IMAGE_SIZE * scale)),
         A.PadIfNeeded(
@@ -72,6 +72,19 @@ train_transforms = A.Compose(
     ],
     bbox_params=A.BboxParams(format="yolo", min_visibility=0.4, label_fields=[],),
 )
+
+train_transforms = A.Compose(
+    [
+        A.LongestMaxSize(max_size=IMAGE_SIZE),
+        A.PadIfNeeded(
+            min_height=IMAGE_SIZE, min_width=IMAGE_SIZE, border_mode=cv2.BORDER_CONSTANT, value=(0, 0, 0)
+        ),
+        A.Normalize(mean=[0, 0, 0], std=[1, 1, 1], max_pixel_value=255,),
+        ToTensorV2(),
+    ],
+    bbox_params=A.BboxParams(format="yolo", min_visibility=0.4, label_fields=[]),
+)
+
 test_transforms = A.Compose(
     [
         A.LongestMaxSize(max_size=IMAGE_SIZE),
