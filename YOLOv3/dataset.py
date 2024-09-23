@@ -60,11 +60,10 @@ class YOLODataset(Dataset):
         #print(f"image names: {self.img_names.iloc[index]}")
         bboxes = np.roll(self.annotations[self.annotations['filename']==self.img_names.iloc[index][0]].iloc[:,1:].values, 4, axis=1).tolist()
         #print(f"bboxes: {bboxes}")
-        
+
 #        img_path = os.path.join(self.img_dir, self.annotations.iloc[index, 0])
         img_path = os.path.join(self.img_dir, self.img_names.iloc[index][0])
         image = np.array(Image.open(img_path).convert("RGB"))
-            
         if self.transform:
             #print("Before augmentations")
             #print("bboxes: ", bboxes)
