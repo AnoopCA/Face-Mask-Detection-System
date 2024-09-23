@@ -66,10 +66,10 @@ class YOLODataset(Dataset):
         image = np.array(Image.open(img_path).convert("RGB"))
             
         if self.transform:
-            print("Before augmentations")
-            print("bboxes: ", bboxes)
+            #print("Before augmentations")
+            #print("bboxes: ", bboxes)
             augmentations = transforms_2(image=image, bboxes=bboxes) #self.transform(image=image, bboxes=bboxes)
-            print("Before image")
+            #print("Before image")
             image = augmentations["image"]
             bboxes = augmentations["bboxes"]
             

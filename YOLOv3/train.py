@@ -38,8 +38,8 @@ def train_fn(train_loader, model, optimizer, loss_fn, scaler, scaled_anchors, ep
             y[1].to(config.DEVICE),
             y[2].to(config.DEVICE),
         )
-        print(f"x: {x}")
-        print(f"y: {y}")
+        #print(f"x: {x}")
+        #print(f"y: {y}")
         with torch.cuda.amp.autocast():
             out = model(x)
             loss = (
