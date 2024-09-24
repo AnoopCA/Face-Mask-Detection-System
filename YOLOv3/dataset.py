@@ -56,19 +56,13 @@ class YOLODataset(Dataset):
     def __getitem__(self, index):
 #        label_path = os.path.join(self.label_dir, self.annotations.iloc[index, 1])
 #        bboxes = np.roll(np.loadtxt(fname=label_path, delimiter=" ", ndmin=2), 4, axis=1).tolist()
-        #print(f"index: {index}")
-        #print(f"image names: {self.img_names.iloc[index]}")
         bboxes = np.roll(self.annotations[self.annotations['filename']==self.img_names.iloc[index][0]].iloc[:,1:].values, 4, axis=1).tolist()
-        #print(f"bboxes: {bboxes}")
 
 #        img_path = os.path.join(self.img_dir, self.annotations.iloc[index, 0])
         img_path = os.path.join(self.img_dir, self.img_names.iloc[index][0])
         image = np.array(Image.open(img_path).convert("RGB"))
         if self.transform:
-            #print("Before augmentations")
-            #print("bboxes: ", bboxes)
-            augmentations = transforms_2(image=image, bboxes=bboxes) #self.transform(image=image, bboxes=bboxes)
-            #print("Before image")
+            augmentations = self.transform(image=image, bboxes=bboxes)
             image = augmentations["image"]
             bboxes = augmentations["bboxes"]
             
@@ -102,22 +96,4 @@ class YOLODataset(Dataset):
                 elif not anchor_taken and iou_anchors[anchor_idx] > self.ignore_iou_thresh:
                     targets[scale_idx][anchor_on_scale, i, j, 0] = -1  # ignore prediction
 
-        #print(f"image: {image}")
-        #print(f"targets: {targets}")
         return image, tuple(targets)
-
-import albumentations as A
-import cv2
-from albumentations.pytorch import ToTensorV2
-
-transforms_2 = A.Compose(
-    [
-        A.LongestMaxSize(max_size=config.IMAGE_SIZE),
-        A.PadIfNeeded(
-            min_height=config.IMAGE_SIZE, min_width=config.IMAGE_SIZE, border_mode=cv2.BORDER_CONSTANT, value=(0, 0, 0)
-        ),
-        A.Normalize(mean=[0, 0, 0], std=[1, 1, 1], max_pixel_value=255,),
-        ToTensorV2(),
-    ],
-    bbox_params=A.BboxParams(format="yolo", min_visibility=0.4, label_fields=[]),
-)

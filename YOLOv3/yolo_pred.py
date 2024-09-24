@@ -39,7 +39,7 @@ def draw_boxes(image_path, model_path, device=config.DEVICE):
     image.show()
 
 # Example usage
-img_path = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\PASCAL_VOC\images\000005.jpg'
-model_path = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_2.pth.tar'
+img_path = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images\with_mask_3424.jpg'
+model_path = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_8.pth.tar'
 draw_boxes(img_path, model_path)
 
