@@ -1,0 +1,9 @@
+Batch size - 128, Epochs - 4, Workers - 10, Processing time - 0:09
+Batch size - 128, Epochs - 4, Workers - 0, Processing time - 0:06
+Batch size - 32, Epochs - 128, Workers - 0, Processing time - 0:35
+Batch size - 8, Epochs - 16, Workers - 0, Processing time - 0:07:56
+Batch size - 16, Epochs - 16, Workers - 0, Processing time - 0:06:26
+Batch size - 32, Epochs - 16, Workers - 0, Processing time - 0:06:28
+Batch size - 64, Epochs - 16, Workers - 0, Processing time - 0:06:31
+Batch size - 16, Epochs - 512, Workers - 0, Processing time - 2:15
+Batch size - 16, Epochs - 1024, Workers - 0, Processing time - 4:24
