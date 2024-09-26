@@ -26,13 +26,13 @@ def draw_boxes(image_path, model_path, device=config.DEVICE):
         predictions = model(image)
     # Apply Non-Maximum Suppression
     #print(f"predictions: {predictions}")
-    print(f"predictions: {len(predictions)}")
-    print(f"predictions[0]: {len(predictions[0])}")
-    print(f"predictions[1]: {len(predictions[0][0])}")
-    print(f"predictions[2]: {len(predictions[0][0][0])}")
-    print(f"predictions[3]: {len(predictions[0][0][0][0])}")
-    print(f"predictions[4]: {len(predictions[0][0][0][0][0])}")
-    print(f"predictions[4] data: {predictions[0][0][0][0][0]}")
+    #print(f"predictions: {len(predictions)}")
+    #print(f"predictions[0]: {len(predictions[0])}")
+    #print(f"predictions[1]: {len(predictions[0][0])}")
+    #print(f"predictions[2]: {len(predictions[0][0][0])}")
+    #print(f"predictions[3]: {len(predictions[0][0][0][0])}")
+    #print(f"predictions[4]: {len(predictions[0][0][0][0][0])}")
+    #print(f"predictions[4] data: {predictions[0][0][0][0][0]}")
 
     pred_boxes = [non_max_suppression(p, iou_threshold=config.NMS_IOU_THRESH, threshold=config.CONF_THRESHOLD) for p in predictions]
 
