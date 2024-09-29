@@ -7,7 +7,6 @@ from albumentations.pytorch import ToTensorV2
 import warnings
 warnings.filterwarnings('ignore')
 
-#DATASET = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\PASCAL_VOC'
 DATASET = r"D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 NUM_WORKERS = 0 #10
@@ -16,8 +15,8 @@ IMAGE_SIZE = 224 #416
 NUM_CLASSES = 2 #20
 LEARNING_RATE = 1e-4 #1e-5
 WEIGHT_DECAY = 1e-4
-NUM_EPOCHS = 1024 #32 #100
-CONF_THRESHOLD = 0.55 #0.5 #0.05
+NUM_EPOCHS = 1024 #32
+CONF_THRESHOLD = 0.55 #0.5
 MAP_IOU_THRESH = 0.55 #0.5
 NMS_IOU_THRESH = 0.55 #0.45
 S = [IMAGE_SIZE // 32, IMAGE_SIZE // 16, IMAGE_SIZE // 8]
