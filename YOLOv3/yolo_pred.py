@@ -24,17 +24,31 @@ def draw_boxes(image_path, model_path, device=config.DEVICE):
     # Get predictions
     with torch.no_grad():
         predictions = model(image)
+
+        bounding_boxes = []
+        for i1 in predictions:
+            for i2 in i1:
+                for i3 in i2:
+                    for i4 in i3:
+                        for i5 in i4:
+                            bounding_boxes.append(i5.tolist())
+        
+        #print(f"bounding_boxes len: {len(bounding_boxes)}")
+        #print(f"bounding_boxes[0] len: {len(bounding_boxes[0])}")
+        #print(f"bounding_boxes[1] len: {len(bounding_boxes[1])}")
     # Apply Non-Maximum Suppression
     #print(f"predictions: {predictions}")
-    #print(f"predictions: {len(predictions)}")
-    #print(f"predictions[0]: {len(predictions[0])}")
-    #print(f"predictions[1]: {len(predictions[0][0])}")
-    #print(f"predictions[2]: {len(predictions[0][0][0])}")
-    #print(f"predictions[3]: {len(predictions[0][0][0][0])}")
-    #print(f"predictions[4]: {len(predictions[0][0][0][0][0])}")
-    #print(f"predictions[4] data: {predictions[0][0][0][0][0]}")
+    #print(f"predictions len: {len(predictions)}")
+    #print(f"predictions[0] len: {len(predictions[2])}")
+    #print(f"predictions[1] len: {len(predictions[2][0])}")
+    #print(f"predictions[2] len: {len(predictions[2][0][0])}")
+    #print(f"predictions[3] len: {len(predictions[2][0][0][0])}")
+    #print(f"predictions[4] len: {len(predictions[2][0][0][0][0])}")
+    #print(f"predictions[4] data: {predictions[2][0][0][0][0]}")
+    #print(f"predictions[3] len: {len(predictions[0][0][0][0])}")
+    #print(f"predictions[3] data: {predictions[0][0][0][0]}")
 
-    pred_boxes = [non_max_suppression(p, iou_threshold=config.NMS_IOU_THRESH, threshold=config.CONF_THRESHOLD) for p in predictions]
+    pred_boxes = [non_max_suppression(p, iou_threshold=config.NMS_IOU_THRESH, threshold=config.CONF_THRESHOLD) for p in [bounding_boxes]] # predictions]
 
     # Draw bounding boxes on the image
     draw = ImageDraw.Draw(image)
