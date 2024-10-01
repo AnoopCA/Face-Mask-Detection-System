@@ -35,6 +35,8 @@ def draw_boxes(image_path, model_path, device=config.DEVICE):
 
 #   There are (1 * 3 * 7 * 7) * (1 * 3 * 14 * 14) * (1 * 3 * 28 * 28) bounding boxes of 7 elements in each before the above preprocessing
 #   There are 3087 bounding boxes of 7 elements, in a list after the above preprocessing
+#   While checking the bounding boxes sent by the train.py, it is 6 dimensional not 7 which is conflicting with the above
+#   Make use of the logic in "get_evaluation_bboxes" function before applying non_max_suppression
 
     pred_boxes = [non_max_suppression(p, iou_threshold=config.NMS_IOU_THRESH, threshold=config.CONF_THRESHOLD) for p in [bounding_boxes]] # predictions]
 
