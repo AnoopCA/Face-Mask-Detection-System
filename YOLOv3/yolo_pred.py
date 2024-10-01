@@ -32,26 +32,14 @@ def draw_boxes(image_path, model_path, device=config.DEVICE):
                     for i4 in i3:
                         for i5 in i4:
                             bounding_boxes.append(i5.tolist())
-        
-        #print(f"bounding_boxes len: {len(bounding_boxes)}")
-        #print(f"bounding_boxes[0] len: {len(bounding_boxes[0])}")
-        #print(f"bounding_boxes[1] len: {len(bounding_boxes[1])}")
-    # Apply Non-Maximum Suppression
-    #print(f"predictions: {predictions}")
-    #print(f"predictions len: {len(predictions)}")
-    #print(f"predictions[0] len: {len(predictions[2])}")
-    #print(f"predictions[1] len: {len(predictions[2][0])}")
-    #print(f"predictions[2] len: {len(predictions[2][0][0])}")
-    #print(f"predictions[3] len: {len(predictions[2][0][0][0])}")
-    #print(f"predictions[4] len: {len(predictions[2][0][0][0][0])}")
-    #print(f"predictions[4] data: {predictions[2][0][0][0][0]}")
-    #print(f"predictions[3] len: {len(predictions[0][0][0][0])}")
-    #print(f"predictions[3] data: {predictions[0][0][0][0]}")
+
+#   There are (1 * 3 * 7 * 7) * (1 * 3 * 14 * 14) * (1 * 3 * 28 * 28) bounding boxes of 7 elements in each before the above preprocessing
+#   There are 3087 bounding boxes of 7 elements, in a list after the above preprocessing
 
     pred_boxes = [non_max_suppression(p, iou_threshold=config.NMS_IOU_THRESH, threshold=config.CONF_THRESHOLD) for p in [bounding_boxes]] # predictions]
 
     # Draw bounding boxes on the image
-    draw = ImageDraw.Draw(image)
+    draw = ImageDraw.Draw(Image.open(image_path).convert("RGB"))
     for boxes in pred_boxes:
         for box in boxes:
             x1, y1, x2, y2 = box[:4].tolist()
