@@ -86,10 +86,10 @@ def non_max_suppression(bboxes, iou_threshold, threshold, box_format="corners"):
     Returns:
         list: bboxes after performing NMS given a specific IoU threshold
     """
-    rnd = np.random.randint(10000)
-    pth = os.path.join("D:/ML_Projects/Face-Mask-Detection-System/YOLOv3/Models", "test_bboxes_" + str(rnd) + ".txt")
-    with open(pth, "w") as f:
-        f.write(str(bboxes))
+    #rnd = np.random.randint(10000)
+    #pth = os.path.join("D:/ML_Projects/Face-Mask-Detection-System/YOLOv3/Models", "test_bboxes_" + str(rnd) + ".txt")
+    #with open(pth, "w") as f:
+    #    f.write(str(bboxes))
 
     assert type(bboxes) == list
 
