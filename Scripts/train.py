@@ -1,6 +1,5 @@
 from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten
 from keras.models import Sequential
-from keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # Define the model
