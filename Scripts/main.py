@@ -6,7 +6,7 @@ from keras.utils import load_img, img_to_array
 import tempfile
 
 facemodel = cv2.CascadeClassifier("face.xml")
-maskmodel = load_model("D:/ML_Projects/Face-Mask-Detection-System/Models/mask_model.h5")
+maskmodel = load_model("D:/ML_Projects/Face-Mask-Detection-System/Models/mask_model_3.h5")
 
 st.title("Face Mask Detection System")
 choice = st.sidebar.selectbox("MENU", ("HOME", "IMAGE", "VIDEO", "CAMERA"))
