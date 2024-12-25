@@ -40,7 +40,6 @@ ANCHORS = [
     [(0.02, 0.03), (0.04, 0.07), (0.08, 0.06)],
 ]
 
-
 scale = 1.1
 train_transforms_1 = A.Compose(
     [
