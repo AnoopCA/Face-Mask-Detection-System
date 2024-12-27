@@ -79,6 +79,8 @@ class YOLODataset(Dataset):
                 S = self.S[scale_idx]
                 i, j = int(S * y), int(S * x)  # which cell
                 anchor_taken = targets[scale_idx][anchor_on_scale, i, j, 0]
+                # Assign a bounding box to a specific anchor in the target tensor if the anchor at the given 
+                # grid cell is not already taken and the current scale does not already have an assigned anchor.
                 if not anchor_taken and not has_anchor[scale_idx]:
                     targets[scale_idx][anchor_on_scale, i, j, 0] = 1
                     x_cell, y_cell = S * x - j, S * y - i  # both between [0,1]
