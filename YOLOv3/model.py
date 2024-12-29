@@ -10,7 +10,6 @@ import warnings
 warnings.filterwarnings('ignore')
 
 """ 
-Information about architecture config:
 Tuple is structured by (filters, kernel_size, stride) 
 Every conv is a same convolution. 
 List is structured by "B" indicating a residual block followed by the number of repeats
