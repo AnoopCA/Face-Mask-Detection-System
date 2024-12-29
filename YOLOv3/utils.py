@@ -368,7 +368,6 @@ def load_checkpoint(checkpoint_file, model, optimizer, lr):
     #for param_group in optimizer.param_groups:
     #   param_group["lr"] = lr
 
-
 def get_loaders(train_csv_path, test_csv_path):
     from dataset import YOLODataset
 
@@ -427,4 +426,3 @@ def get_loaders(train_csv_path, test_csv_path):
     )
 
     return train_loader, test_loader, train_eval_loader
-
