@@ -41,6 +41,7 @@ def intersection_over_union(boxes_preds, boxes_labels, box_format="midpoint"):
     """
 
     if box_format == "midpoint":
+        # x1=x−w/2, y1=y−h/2
         box1_x1 = boxes_preds[..., 0:1] - boxes_preds[..., 2:3] / 2
         box1_y1 = boxes_preds[..., 1:2] - boxes_preds[..., 3:4] / 2
         box1_x2 = boxes_preds[..., 0:1] + boxes_preds[..., 2:3] / 2
@@ -77,8 +78,7 @@ def non_max_suppression(bboxes, iou_threshold, threshold, box_format="corners"):
     Does Non Max Suppression given bboxes
 
     Parameters:
-        bboxes (list): list of lists containing all bboxes with each bboxes
-        specified as [class_pred, prob_score, x1, y1, x2, y2]
+        bboxes (list): list of lists containing all bboxes with each bboxes specified as [class_pred, prob_score, x1, y1, x2, y2]
         iou_threshold (float): threshold where predicted bboxes is correct
         threshold (float): threshold to remove predicted bboxes (independent of IoU)
         box_format (str): "midpoint" or "corners" used to specify bboxes
@@ -99,7 +99,8 @@ def non_max_suppression(bboxes, iou_threshold, threshold, box_format="corners"):
 
     while bboxes:
         chosen_box = bboxes.pop(0)
-
+        # Consider the bounding boxes that belong to different classes or do not correspond to the same object.
+        # (Less than iou_threshold means, exclude bounding boxes that has higher overlapp.)
         bboxes = [
             box
             for box in bboxes
@@ -118,8 +119,7 @@ def non_max_suppression(bboxes, iou_threshold, threshold, box_format="corners"):
 
 
 def mean_average_precision(
-    pred_boxes, true_boxes, iou_threshold=0.5, box_format="midpoint", num_classes=config.NUM_CLASSES
-):
+    pred_boxes, true_boxes, iou_threshold=0.5, box_format="midpoint", num_classes=config.NUM_CLASSES):
     """
     This function calculates mean average precision (mAP)
 
@@ -159,7 +159,7 @@ def mean_average_precision(
         amount_bboxes = Counter([gt[0] for gt in ground_truths])
 
         # We then go through each key, val in this dictionary and convert to the following (w.r.t same example):
-        # ammount_bboxes = {0:torch.tensor[0,0,0], 1:torch.tensor[0,0,0,0,0]}
+        # amount_bboxes = {0:torch.tensor[0,0,0], 1:torch.tensor[0,0,0,0,0]}
         for key, val in amount_bboxes.items():
             amount_bboxes[key] = torch.zeros(val)
 
