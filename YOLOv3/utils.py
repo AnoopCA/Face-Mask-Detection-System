@@ -124,8 +124,7 @@ def mean_average_precision(
     This function calculates mean average precision (mAP)
 
     Parameters:
-        pred_boxes (list): list of lists containing all bboxes with each bboxes
-        specified as [train_idx, class_prediction, prob_score, x1, y1, x2, y2]
+        pred_boxes (list): list of lists containing all bboxes with each bboxes specified as [train_idx, class_prediction, prob_score, x1, y1, x2, y2]
         true_boxes (list): Similar as pred_boxes except all the correct ones
         iou_threshold (float): threshold where predicted bboxes is correct
         box_format (str): "midpoint" or "corners" used to specify bboxes
@@ -202,7 +201,7 @@ def mean_average_precision(
                 else:
                     FP[detection_idx] = 1
 
-            # if IOU is lower then the detection is a false positive
+            # if IOU is lower than the detection is a false positive
             else:
                 FP[detection_idx] = 1
 
