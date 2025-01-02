@@ -328,8 +328,8 @@ def check_class_accuracy(model, loader, threshold):
 
         for i in range(3):
             y[i] = y[i].to(config.DEVICE)
-            obj = y[i][..., 0] == 1 # in paper this is Iobj_i
-            noobj = y[i][..., 0] == 0  # in paper this is Iobj_i
+            obj = y[i][..., 0] == 1
+            noobj = y[i][..., 0] == 0
 
             correct_class += torch.sum(
                 torch.argmax(out[i][..., 5:][obj], dim=-1) == y[i][..., 5][obj]
