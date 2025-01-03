@@ -105,12 +105,11 @@ def non_max_suppression(bboxes, iou_threshold, threshold, box_format="corners"):
             box
             for box in bboxes
             if box[0] != chosen_box[0]
-            or intersection_over_union(
-                torch.tensor(chosen_box[2:]),
-                torch.tensor(box[2:]),
-                box_format=box_format,
-            )
-            < iou_threshold
+                or intersection_over_union(
+                    torch.tensor(chosen_box[2:]),
+                    torch.tensor(box[2:]),
+                    box_format=box_format,
+                                          ) < iou_threshold
         ]
 
         bboxes_after_nms.append(chosen_box)
@@ -124,8 +123,7 @@ def mean_average_precision(
     This function calculates mean average precision (mAP)
 
     Parameters:
-        pred_boxes (list): list of lists containing all bboxes with each bboxes
-        specified as [train_idx, class_prediction, prob_score, x1, y1, x2, y2]
+        pred_boxes (list): list of lists containing all bboxes with each bboxes specified as [train_idx, class_prediction, prob_score, x1, y1, x2, y2]
         true_boxes (list): Similar as pred_boxes except all the correct ones
         iou_threshold (float): threshold where predicted bboxes is correct
         box_format (str): "midpoint" or "corners" used to specify bboxes
@@ -202,7 +200,7 @@ def mean_average_precision(
                 else:
                     FP[detection_idx] = 1
 
-            # if IOU is lower then the detection is a false positive
+            # if IOU is lower than the detection is a false positive
             else:
                 FP[detection_idx] = 1
 
@@ -329,8 +327,8 @@ def check_class_accuracy(model, loader, threshold):
 
         for i in range(3):
             y[i] = y[i].to(config.DEVICE)
-            obj = y[i][..., 0] == 1 # in paper this is Iobj_i
-            noobj = y[i][..., 0] == 0  # in paper this is Iobj_i
+            obj = y[i][..., 0] == 1
+            noobj = y[i][..., 0] == 0
 
             correct_class += torch.sum(
                 torch.argmax(out[i][..., 5:][obj], dim=-1) == y[i][..., 5][obj]
