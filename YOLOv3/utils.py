@@ -276,9 +276,7 @@ def get_evaluation_bboxes(
 
 def cells_to_bboxes(predictions, anchors, S, is_preds=True):
     """
-    Scales the predictions coming from the model to
-    be relative to the entire image such that they for example later
-    can be plotted or.
+    Scales the predictions coming from the model to be relative to the entire image.
     INPUT:
     predictions: tensor of size (N, 3, S, S, num_classes+5)
     anchors: the anchors used for the predictions
