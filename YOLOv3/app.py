@@ -16,9 +16,9 @@ from utils import cells_to_bboxes, non_max_suppression
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images'
-model_path = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_10.pth.tar'
+model_path = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_11.pth.tar'
 
-def get_bboxes(x, model, iou_threshold, anchors, threshold,):
+def get_bboxes(x, model, iou_threshold, anchors, threshold):
     model.eval()
     all_pred_boxes = []
     with torch.no_grad():
@@ -28,11 +28,12 @@ def get_bboxes(x, model, iou_threshold, anchors, threshold,):
         S = predictions[i].shape[2]
         anchor = torch.tensor([*anchors[i]]).to(device) * S
         boxes_scale_i = cells_to_bboxes(predictions[i], anchor, S=S, is_preds=True)
+        print(f"boxes_scale_i: {boxes_scale_i}")
         for idx, (box) in enumerate(boxes_scale_i):
             bboxes[idx] += box
-    nms_boxes = non_max_suppression(bboxes[0], iou_threshold=iou_threshold, threshold=threshold)
+    #nms_boxes = non_max_suppression(bboxes[0], iou_threshold=iou_threshold, threshold=threshold)
     model.train()
-    return nms_boxes
+    return bboxes[0] #nms_boxes
 
 model = YOLOv3(num_classes=config.NUM_CLASSES)
 checkpoint = torch.load(model_path, map_location=device)
@@ -46,8 +47,8 @@ transform = transforms.Compose([
                                  transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
                               ])
 
-plt.ion()  # Turn on interactive mode
-fig, ax = plt.subplots(figsize=(10, 10))
+#plt.ion()  # Turn on interactive mode
+#fig, ax = plt.subplots(figsize=(10, 10))
 
 for img_name in os.listdir(img_dir):
     img_path = os.path.join(img_dir, img_name)
@@ -57,10 +58,10 @@ for img_name in os.listdir(img_dir):
     img = transform(img)
     img = img.unsqueeze(0)
     img = img.to(device)
-    results = get_bboxes(img, model, config.NMS_IOU_THRESH, anchors=config.ANCHORS, threshold=config.CONF_THRESHOLD,)
+    results = get_bboxes(img, model, iou_threshold=config.NMS_IOU_THRESH, anchors=config.ANCHORS, threshold=config.CONF_THRESHOLD)
     for r in results:
         class_pred, prob_score, x1, y1, x2, y2 = r
-        if prob_score > 0.85:
+        if prob_score > 0.001:
             width, height = original_img.size
             x1 = int(x1 * width)
             y1 = int(y1 * height)
@@ -69,14 +70,14 @@ for img_name in os.listdir(img_dir):
             cv2.rectangle(original_img_np, (x1, y1), (x2, y2), (0, 255, 0), 1)
 
     # Update the figure with the new image
-    ax.clear()  # Clear the previous image
-    ax.imshow(original_img_np)
-    ax.axis("off")
-    ax.set_title(f"Prediction: {img_name}")
-    plt.draw()  # Redraw the updated image
-    plt.pause(0.000001)  # Pause to simulate the video effect, adjust as necessary
+    #ax.clear()  # Clear the previous image
+    #ax.imshow(original_img_np)
+    #ax.axis("off")
+    #ax.set_title(f"Prediction: {img_name}")
+    #plt.draw()  # Redraw the updated image
+    #plt.pause(60)  # Pause to simulate the video effect, adjust as necessary
 
-plt.ioff()  # Turn off interactive mode to stop dynamic updates
+#plt.ioff()  # Turn off interactive mode to stop dynamic updates
 
     #output_img_path = os.path.join(img_out, f"output_{img_name}")
     #cv2.imwrite(output_img_path, original_img)
