@@ -28,12 +28,11 @@ def get_bboxes(x, model, iou_threshold, anchors, threshold):
         S = predictions[i].shape[2]
         anchor = torch.tensor([*anchors[i]]).to(device) * S
         boxes_scale_i = cells_to_bboxes(predictions[i], anchor, S=S, is_preds=True)
-        print(f"boxes_scale_i: {boxes_scale_i}")
         for idx, (box) in enumerate(boxes_scale_i):
             bboxes[idx] += box
-    #nms_boxes = non_max_suppression(bboxes[0], iou_threshold=iou_threshold, threshold=threshold)
+    nms_boxes = non_max_suppression(bboxes[0], iou_threshold=iou_threshold, threshold=threshold)
     model.train()
-    return bboxes[0] #nms_boxes
+    return nms_boxes
 
 model = YOLOv3(num_classes=config.NUM_CLASSES)
 checkpoint = torch.load(model_path, map_location=device)
@@ -42,13 +41,13 @@ model.to(device)
 model.eval()
 
 transform = transforms.Compose([
-                                 transforms.Resize((416, 416)),
+                                 transforms.Resize((224, 224)), #(416, 416)
                                  transforms.ToTensor(),
                                  transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
                               ])
 
-#plt.ion()  # Turn on interactive mode
-#fig, ax = plt.subplots(figsize=(10, 10))
+plt.ion()  # Turn on interactive mode
+fig, ax = plt.subplots(figsize=(10, 10))
 
 for img_name in os.listdir(img_dir):
     img_path = os.path.join(img_dir, img_name)
@@ -68,16 +67,15 @@ for img_name in os.listdir(img_dir):
             x2 = int(x2 * width)
             y2 = int(y2 * height)
             cv2.rectangle(original_img_np, (x1, y1), (x2, y2), (0, 255, 0), 1)
-
     # Update the figure with the new image
-    #ax.clear()  # Clear the previous image
-    #ax.imshow(original_img_np)
-    #ax.axis("off")
-    #ax.set_title(f"Prediction: {img_name}")
-    #plt.draw()  # Redraw the updated image
-    #plt.pause(60)  # Pause to simulate the video effect, adjust as necessary
+    ax.clear()  # Clear the previous image
+    ax.imshow(original_img_np)
+    ax.axis("off")
+    ax.set_title(f"Prediction: {img_name}")
+    plt.draw()  # Redraw the updated image
+    plt.pause(4)  # Pause to simulate the video effect, adjust as necessary
 
-#plt.ioff()  # Turn off interactive mode to stop dynamic updates
-
+plt.ioff()  # Turn off interactive mode to stop dynamic updates
+    #break
     #output_img_path = os.path.join(img_out, f"output_{img_name}")
     #cv2.imwrite(output_img_path, original_img)
