@@ -83,6 +83,10 @@ def main():
     for epoch in range(config.NUM_EPOCHS):
         train_fn(train_loader, model, optimizer, loss_fn, scaler, scaled_anchors, epoch)
 
+        if (epoch+1) % config.SAVE_CHECKPOINT_FREQ == 0:
+            if config.SAVE_MODEL:
+                save_checkpoint(model, optimizer, filename=config.SAVE_MODEL_NAME)
+
         if (epoch+1) % config.PRINT_METRIC == 0:
             check_class_accuracy(model, test_loader, threshold=config.CONF_THRESHOLD)
             pred_boxes, true_boxes = get_evaluation_bboxes(
@@ -101,10 +105,6 @@ def main():
             )
             print(f"MAP: {mapval.item()}")
             model.train()
-
-            if config.SAVE_MODEL:
-                save_checkpoint(model, optimizer, filename=config.SAVE_MODEL_NAME)
-
 
 if __name__ == "__main__":
     main()
