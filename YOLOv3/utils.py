@@ -111,6 +111,15 @@ def non_max_suppression(bboxes, iou_threshold, threshold, box_format="corners"):
                                           ) < iou_threshold
         ]
 
+        for box in bboxes:
+            if box[0] == chosen_box[0]:
+                iou = intersection_over_union(torch.tensor(chosen_box[2:]),torch.tensor(box[2:]),box_format=box_format)
+                #if iou != 0:
+                    #print(f"actual IOU: {iou}")
+                #else:
+                    #print(f"chosen_box[2:], box[2:]: {chosen_box[2:], box[2:]}")
+                    #print(f"actual IOU: {iou}")
+
         bboxes_after_nms.append(chosen_box)
        
     return bboxes_after_nms

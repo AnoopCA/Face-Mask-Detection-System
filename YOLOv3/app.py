@@ -4,8 +4,10 @@ import os
 import sys
 import torch
 import cv2
-from torchvision import transforms
+#from torchvision import transforms
 from PIL import Image
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 import matplotlib.pyplot as plt
 
 sys.path.append(os.path.abspath(r"D:\ML_Projects\Face-Mask-Detection-System\YOLOv3"))
@@ -16,7 +18,7 @@ from utils import cells_to_bboxes, non_max_suppression
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images'
-model_path = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_11.pth.tar'
+model_path = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_12.pth.tar'
 
 def get_bboxes(x, model, iou_threshold, anchors, threshold):
     model.eval()
@@ -30,7 +32,7 @@ def get_bboxes(x, model, iou_threshold, anchors, threshold):
         boxes_scale_i = cells_to_bboxes(predictions[i], anchor, S=S, is_preds=True)
         for idx, (box) in enumerate(boxes_scale_i):
             bboxes[idx] += box
-    nms_boxes = non_max_suppression(bboxes[0], iou_threshold=iou_threshold, threshold=threshold)
+    nms_boxes = non_max_suppression(bboxes[0], iou_threshold=iou_threshold, threshold=threshold, box_format="midpoint")
     model.train()
     return nms_boxes
 
@@ -40,11 +42,23 @@ model.load_state_dict(checkpoint['state_dict'])
 model.to(device)
 model.eval()
 
-transform = transforms.Compose([
-                                 transforms.Resize((224, 224)), #(416, 416)
-                                 transforms.ToTensor(),
-                                 transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-                              ])
+#transform = transforms.Compose([
+#                                 transforms.Resize((224, 224)), #(416, 416)
+#                                 transforms.ToTensor(),
+#                                 transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+#                              ])
+
+transform = A.Compose(
+    [
+        A.LongestMaxSize(max_size=config.IMAGE_SIZE),
+        A.PadIfNeeded(
+            min_height=config.IMAGE_SIZE, min_width=config.IMAGE_SIZE, border_mode=cv2.BORDER_CONSTANT, value=(0, 0, 0)
+        ),
+        A.Normalize(mean=[0, 0, 0], std=[1, 1, 1], max_pixel_value=255,),
+        ToTensorV2(),
+    ],
+    bbox_params=A.BboxParams(format="yolo", min_visibility=0.4, label_fields=[]),
+)
 
 plt.ion()  # Turn on interactive mode
 fig, ax = plt.subplots(figsize=(10, 10))
@@ -54,13 +68,14 @@ for img_name in os.listdir(img_dir):
     img = Image.open(img_path).convert("RGB")
     original_img = img
     original_img_np = np.array(img)
-    img = transform(img)
+    #img = transform(img)
+    img = transform(image=np.array(img))["image"]
     img = img.unsqueeze(0)
     img = img.to(device)
     results = get_bboxes(img, model, iou_threshold=config.NMS_IOU_THRESH, anchors=config.ANCHORS, threshold=config.CONF_THRESHOLD)
     for r in results:
         class_pred, prob_score, x1, y1, x2, y2 = r
-        if prob_score > 0.001:
+        if prob_score > 0.96:
             width, height = original_img.size
             x1 = int(x1 * width)
             y1 = int(y1 * height)
@@ -73,7 +88,7 @@ for img_name in os.listdir(img_dir):
     ax.axis("off")
     ax.set_title(f"Prediction: {img_name}")
     plt.draw()  # Redraw the updated image
-    plt.pause(4)  # Pause to simulate the video effect, adjust as necessary
+    plt.pause(2)  # Pause to simulate the video effect, adjust as necessary
 
 plt.ioff()  # Turn off interactive mode to stop dynamic updates
     #break
