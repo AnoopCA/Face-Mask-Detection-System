@@ -1,10 +1,9 @@
 import albumentations as A
 import cv2
 import torch
-
 from albumentations.pytorch import ToTensorV2
-
 import warnings
+
 warnings.filterwarnings('ignore')
 
 DATASET = r"D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2"
@@ -42,7 +41,7 @@ ANCHORS = [
 ]
 
 scale = 1.1
-train_transforms_1 = A.Compose(
+train_transforms = A.Compose(
     [
         A.LongestMaxSize(max_size=int(IMAGE_SIZE * scale)),
         A.PadIfNeeded(
@@ -70,18 +69,6 @@ train_transforms_1 = A.Compose(
         ToTensorV2(),
     ],
     bbox_params=A.BboxParams(format="yolo", min_visibility=0.4, label_fields=[],),
-)
-
-train_transforms = A.Compose(
-    [
-        A.LongestMaxSize(max_size=IMAGE_SIZE),
-        A.PadIfNeeded(
-            min_height=IMAGE_SIZE, min_width=IMAGE_SIZE, border_mode=cv2.BORDER_CONSTANT, value=(0, 0, 0)
-        ),
-        A.Normalize(mean=[0, 0, 0], std=[1, 1, 1], max_pixel_value=255,),
-        ToTensorV2(),
-    ],
-    bbox_params=A.BboxParams(format="yolo", min_visibility=0.4, label_fields=[]),
 )
 
 test_transforms = A.Compose(
