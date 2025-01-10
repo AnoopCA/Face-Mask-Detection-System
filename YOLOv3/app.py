@@ -4,10 +4,7 @@ import os
 import sys
 import torch
 import cv2
-#from torchvision import transforms
 from PIL import Image
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
 import matplotlib.pyplot as plt
 
 sys.path.append(os.path.abspath(r"D:\ML_Projects\Face-Mask-Detection-System\YOLOv3"))
@@ -22,7 +19,6 @@ model_path = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov
 
 def get_bboxes(x, model, iou_threshold, anchors, threshold):
     model.eval()
-    all_pred_boxes = []
     with torch.no_grad():
         predictions = model(x)
     bboxes = [[] for _ in range(1)]
@@ -42,24 +38,6 @@ model.load_state_dict(checkpoint['state_dict'])
 model.to(device)
 model.eval()
 
-#transform = transforms.Compose([
-#                                 transforms.Resize((224, 224)), #(416, 416)
-#                                 transforms.ToTensor(),
-#                                 transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-#                              ])
-
-transform = A.Compose(
-    [
-        A.LongestMaxSize(max_size=config.IMAGE_SIZE),
-        A.PadIfNeeded(
-            min_height=config.IMAGE_SIZE, min_width=config.IMAGE_SIZE, border_mode=cv2.BORDER_CONSTANT, value=(0, 0, 0)
-        ),
-        A.Normalize(mean=[0, 0, 0], std=[1, 1, 1], max_pixel_value=255,),
-        ToTensorV2(),
-    ],
-    bbox_params=A.BboxParams(format="yolo", min_visibility=0.4, label_fields=[]),
-)
-
 plt.ion()  # Turn on interactive mode
 fig, ax = plt.subplots(figsize=(10, 10))
 
@@ -68,29 +46,30 @@ for img_name in os.listdir(img_dir):
     img = Image.open(img_path).convert("RGB")
     original_img = img
     original_img_np = np.array(img)
-    #img = transform(img)
-    img = transform(image=np.array(img))["image"]
+    img = config.test_transforms(image=np.array(img))["image"]
     img = img.unsqueeze(0)
     img = img.to(device)
     results = get_bboxes(img, model, iou_threshold=config.NMS_IOU_THRESH, anchors=config.ANCHORS, threshold=config.CONF_THRESHOLD)
     for r in results:
-        class_pred, prob_score, x1, y1, x2, y2 = r
-        if prob_score > 0.96:
-            width, height = original_img.size
-            x1 = int(x1 * width)
-            y1 = int(y1 * height)
-            x2 = int(x2 * width)
-            y2 = int(y2 * height)
-            cv2.rectangle(original_img_np, (x1, y1), (x2, y2), (0, 255, 0), 1)
+        class_pred, prob_score, center_x, center_y, width, height = r
+        if prob_score > 0.95:
+            # Convert YOLO format (center_x, center_y, width, height) to pixel coordinates
+            img_width, img_height = original_img.size
+            x1 = int((center_x - width / 2) * img_width)
+            y1 = int((center_y - height / 2) * img_height)
+            x2 = int((center_x + width / 2) * img_width)
+            y2 = int((center_y + height / 2) * img_height)
+            if class_pred == 0:
+                cv2.rectangle(original_img_np, (x1, y1), (x2, y2), (0, 255, 0), 1)
+            else:
+                cv2.rectangle(original_img_np, (x1, y1), (x2, y2), (255, 0, 0), 1)
+    
     # Update the figure with the new image
     ax.clear()  # Clear the previous image
     ax.imshow(original_img_np)
     ax.axis("off")
     ax.set_title(f"Prediction: {img_name}")
     plt.draw()  # Redraw the updated image
-    plt.pause(2)  # Pause to simulate the video effect, adjust as necessary
+    plt.pause(1)  # Pause to simulate the video effect, adjust as necessary
 
 plt.ioff()  # Turn off interactive mode to stop dynamic updates
-    #break
-    #output_img_path = os.path.join(img_out, f"output_{img_name}")
-    #cv2.imwrite(output_img_path, original_img)
