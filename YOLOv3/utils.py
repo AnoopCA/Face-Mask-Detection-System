@@ -129,7 +129,6 @@ def mean_average_precision(
 
     # list storing all AP for respective classes
     average_precisions = []
-
     # used for numerical stability later on
     epsilon = 1e-6
 
@@ -224,7 +223,6 @@ def get_evaluation_bboxes(
     train_idx = 0
     all_pred_boxes = []
     all_true_boxes = []
-    #for batch_idx, (x, labels) in enumerate(tqdm(loader, desc="Batches in bounding box evaluation")):
     for batch_idx, (x, labels) in enumerate(loader):
         x = x.to(device)
 
@@ -311,7 +309,6 @@ def check_class_accuracy(model, loader, threshold):
     tot_noobj, correct_noobj = 0, 0
     tot_obj, correct_obj = 0, 0
 
-    #for idx, (x, y) in enumerate(tqdm(loader, desc="Calculating class accuracy")):
     for idx, (x, y) in enumerate(loader):
         x = x.to(config.DEVICE)
         with torch.no_grad():
@@ -353,10 +350,6 @@ def load_checkpoint(checkpoint_file, model, optimizer, lr):
     checkpoint = torch.load(checkpoint_file, map_location=config.DEVICE)
     model.load_state_dict(checkpoint["state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer"])
-
-    # If we don't do this then it will just have learning rate of old checkpoint and it will lead to many hours of debugging \:
-    #for param_group in optimizer.param_groups:
-    #   param_group["lr"] = lr
 
 def get_loaders(train_csv_path, test_csv_path):
     from dataset import YOLODataset
