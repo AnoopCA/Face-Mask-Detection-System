@@ -70,6 +70,6 @@ for img_name in os.listdir(img_dir):
     ax.axis("off")
     ax.set_title(f"Prediction: {img_name}")
     plt.draw()  # Redraw the updated image
-    plt.pause(1)  # Pause to simulate the video effect, adjust as necessary
+    plt.pause(10)  # Pause to simulate the video effect, adjust as necessary
 
 plt.ioff()  # Turn off interactive mode to stop dynamic updates
