@@ -10,12 +10,8 @@ warnings.filterwarnings('ignore')
 
 # This function accepts width and height of the 2 bounding boxes and returns Intersection over union of the corresponding boxes
 def iou_width_height(boxes1, boxes2):
-    intersection = torch.min(boxes1[..., 0], boxes2[..., 0]) * torch.min(
-        boxes1[..., 1], boxes2[..., 1]
-    )
-    union = (
-        boxes1[..., 0] * boxes1[..., 1] + boxes2[..., 0] * boxes2[..., 1] - intersection
-    )
+    intersection = torch.min(boxes1[..., 0], boxes2[..., 0]) * torch.min(boxes1[..., 1], boxes2[..., 1])
+    union = (boxes1[..., 0] * boxes1[..., 1] + boxes2[..., 0] * boxes2[..., 1] - intersection)
     return intersection / union
 
 # This function calculates intersection over union (iou) given pred boxes and target boxes.
