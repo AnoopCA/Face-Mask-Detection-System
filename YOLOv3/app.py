@@ -70,7 +70,7 @@ for img_name in os.listdir(img_dir):
     ax.axis("off")
     ax.set_title(f"Prediction: {img_name}")
     plt.draw()  # Redraw the updated image
-    plt.pause(1)  # Pause to simulate the video effect, adjust as necessary
+    plt.pause(5)  # Pause to simulate the video effect, adjust as necessary
 
     #fig.set_size_inches(original_img_np.shape[1] / 100, original_img_np.shape[0] / 100)  # Scale to 100 DPI
     #ax.clear()  # Clear the previous image
