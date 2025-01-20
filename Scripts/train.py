@@ -29,5 +29,3 @@ mask_model = tf_model.fit(train_img, epochs=100, validation_data=test_img)
 
 # Save the model
 tf_model.save(r"D:\ML_Projects\Face-Mask-Detection-System\Models\mask_model_5.h5", mask_model)
-
-#Epoch 100 - training started at 5:19am
