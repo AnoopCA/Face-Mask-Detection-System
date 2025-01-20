@@ -1,7 +1,3 @@
-"""
-Main file for training Yolo model on Pascal VOC and COCO dataset
-"""
-
 import config
 import torch
 import torch.optim as optim

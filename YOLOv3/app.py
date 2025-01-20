@@ -70,15 +70,6 @@ for img_name in os.listdir(img_dir):
     ax.axis("off")
     ax.set_title(f"Prediction: {img_name}")
     plt.draw()  # Redraw the updated image
-    plt.pause(5)  # Pause to simulate the video effect, adjust as necessary
-
-    #fig.set_size_inches(original_img_np.shape[1] / 100, original_img_np.shape[0] / 100)  # Scale to 100 DPI
-    #ax.clear()  # Clear the previous image
-    #ax.imshow(original_img_np)
-    #ax.axis("off")
-    #ax.set_title(f"Prediction: {img_name}")
-    #plt.tight_layout()  # Ensure the image fills the figure
-    #plt.draw()  # Redraw the updated image
-    #plt.pause(0.0000001)
+    plt.pause(1)  # Pause to simulate the video effect, adjust as necessary
 
 plt.ioff()  # Turn off interactive mode to stop dynamic updates
