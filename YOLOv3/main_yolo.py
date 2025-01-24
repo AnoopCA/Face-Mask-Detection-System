@@ -81,12 +81,15 @@ elif choice == "VIDEO":
     file = st.file_uploader("Upload Video")
     windows = st.empty()
     if file:
+        skip_num = 0
         vid = cv2.VideoCapture(file.name)
         while(vid.isOpened()):
+            skip_num += 1
             flag, frame=vid.read()
             if (flag):
-                img = get_pred(frame, 3)
-                windows.image(img, channels="RGB")
+                if skip_num % 5 == 0:
+                    img = get_pred(frame, 3)
+                    windows.image(img, channels="RGB")
 
 elif choice == "CAMERA":
     st.session_state["CAMERA"] = True
