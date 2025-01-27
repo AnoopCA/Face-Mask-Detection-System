@@ -5,6 +5,7 @@ import torch
 import cv2
 from PIL import Image
 import streamlit as st
+import tempfile
 
 sys.path.append(os.path.abspath(r"D:\ML_Projects\Face-Mask-Detection-System\YOLOv3"))
 from model import YOLOv3
@@ -74,22 +75,23 @@ elif choice == "IMAGE":
         b = file.getvalue()
         d = np.frombuffer(b, np.uint8)
         img = cv2.imdecode(d, cv2.IMREAD_COLOR)
-        img = get_pred(img, 1)
+        img = get_pred(img, 2)
         st.image(img, channels='RGB', width=400)
 
 elif choice == "VIDEO":
     file = st.file_uploader("Upload Video")
     windows = st.empty()
     if file:
-        skip_num = 0
-        vid = cv2.VideoCapture(file.name)
-        while(vid.isOpened()):
-            skip_num += 1
-            flag, frame=vid.read()
-            if (flag):
-                if skip_num % 5 == 0:
-                    img = get_pred(frame, 3)
-                    windows.image(img, channels="RGB")
+        temp_file = tempfile.NamedTemporaryFile(delete=False)
+        temp_file.write(file.read())
+        vid = cv2.VideoCapture(temp_file.name)
+        while vid.isOpened():
+            flag, frame = vid.read()
+            if not flag:
+                break
+            img = get_pred(frame, 2)
+            windows.image(img, channels="RGB")
+        vid.release()
 
 elif choice == "CAMERA":
     st.session_state["CAMERA"] = True
@@ -106,5 +108,6 @@ elif choice == "CAMERA":
         while(vid.isOpened()):
             flag, frame=vid.read()
             if (flag):
-                img = get_pred(frame, 1)
-                windows.image(img, channels="RBG")
+                img = get_pred(frame, 2)
+                windows.image(img, channels="RGB")
+        vid.release()
