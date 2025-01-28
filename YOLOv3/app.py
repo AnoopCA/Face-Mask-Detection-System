@@ -1,3 +1,4 @@
+# Import necessary libraries
 import numpy as np
 import pandas as pd
 import os
@@ -7,16 +8,21 @@ import cv2
 from PIL import Image
 import matplotlib.pyplot as plt
 
+# Add the specified directory to the system path to enable importing modules from the YOLOv3 project folder
 sys.path.append(os.path.abspath(r"D:\ML_Projects\Face-Mask-Detection-System\YOLOv3"))
+
+# Import the custom classes and functions
 from model import YOLOv3
 import config
 from utils import cells_to_bboxes, non_max_suppression
 
+# Setup GPU
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images'
 model_path = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_12.pth.tar'
 
+# Function to get bounding boxes from model predictions with non-max suppression applied
 def get_bboxes(x, model, iou_threshold, anchors, threshold):
     model.eval()
     with torch.no_grad():
@@ -32,15 +38,18 @@ def get_bboxes(x, model, iou_threshold, anchors, threshold):
     model.train()
     return nms_boxes
 
+# Load the YOLOv3 model with pre-trained weights and set it to evaluation mode
 model = YOLOv3(num_classes=config.NUM_CLASSES)
 checkpoint = torch.load(model_path, map_location=device)
 model.load_state_dict(checkpoint['state_dict'])
 model.to(device)
 model.eval()
 
-plt.ion()  # Turn on interactive mode
+# Enable interactive mode and create a plot figure with specified dimensions
+plt.ion()
 fig, ax = plt.subplots(figsize=(8, 6))
 
+# Perform object detection on images in the directory and draw bounding boxes on the detected objects
 for img_name in os.listdir(img_dir):
     img_path = os.path.join(img_dir, img_name)
     img = Image.open(img_path).convert("RGB")
@@ -72,4 +81,5 @@ for img_name in os.listdir(img_dir):
     plt.draw()  # Redraw the updated image
     plt.pause(1)  # Pause to simulate the video effect, adjust as necessary
 
-plt.ioff()  # Turn off interactive mode to stop dynamic updates
+# Turn off interactive mode to stop dynamic updates
+plt.ioff()
