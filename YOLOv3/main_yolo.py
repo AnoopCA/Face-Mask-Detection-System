@@ -1,3 +1,4 @@
+# Import necessary libraries
 import numpy as np
 import os
 import sys
@@ -7,15 +8,18 @@ from PIL import Image
 import streamlit as st
 import tempfile
 
+# Add the specified directory to the system path to enable importing modules from the YOLOv3 project folder
 sys.path.append(os.path.abspath(r"D:\ML_Projects\Face-Mask-Detection-System\YOLOv3"))
 from model import YOLOv3
 import config
 from utils import cells_to_bboxes, non_max_suppression
 
+# Setup GPU
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 model_path = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_12.pth.tar'
 
+# Function to get bounding boxes from model predictions with non-max suppression applied
 def get_bboxes(x, model, iou_threshold, anchors, threshold):
     model.eval()
     with torch.no_grad():
@@ -31,12 +35,14 @@ def get_bboxes(x, model, iou_threshold, anchors, threshold):
     model.train()
     return nms_boxes
 
+# Load the YOLOv3 model with pre-trained weights and set it to evaluation mode
 model = YOLOv3(num_classes=config.NUM_CLASSES)
 checkpoint = torch.load(model_path, map_location=device)
 model.load_state_dict(checkpoint['state_dict'])
 model.to(device)
 model.eval()
 
+# Object Detection and Bounding Box Visualization Using YOLO Predictions
 def get_pred(raw_img, bb_ln_width):
     img_rgb = cv2.cvtColor(raw_img, cv2.COLOR_BGR2RGB)
     img = Image.fromarray(img_rgb)
