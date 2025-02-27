@@ -19,6 +19,7 @@ from utils import cells_to_bboxes, non_max_suppression
 # Setup GPU
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+# Setup path to test images and the model
 img_dir = r'D:\ML_Projects\Face-Mask-Detection-System\Data\Kaggle_2\test_images'
 model_path = r'D:\ML_Projects\Face-Mask-Detection-System\YOLOv3\Models\fmd_yolov3_12.pth.tar'
 
